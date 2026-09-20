@@ -1,0 +1,9 @@
+{
+  "name": "vehicle-auctions-site",
+  "version": "1.0.0",
+  "description": "Vehicle Auctions MVP - Static site",
+  "private": true,
+  "scripts": {
+    "dev": "npx http-server"
+  }
+}
