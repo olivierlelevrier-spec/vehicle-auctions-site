@@ -191,7 +191,7 @@
             const id = parseInt(params.get('id'));
             const listing = SAMPLE_LISTINGS.find(l => l.id === id);
 
-            const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
+            window.location.href = 'bid.html?id=' + id; return; const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
             if (!newBid) return;
 
             const bidAmount = parseInt(newBid);
