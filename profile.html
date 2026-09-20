@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .nav-buttons { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-secondary { background: #3b82f6; color: white; }
+        .btn-secondary:hover { background: #2563eb; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .profile-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        .profile-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+        .avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+        .profile-info h2 { font-size: 1.5rem; margin-bottom: 5px; }
+        .profile-info p { color: #94a3b8; font-size: 0.9rem; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .stat { background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #3b82f6; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #3b82f6; }
+        .stat-label { color: #94a3b8; font-size: 0.85rem; margin-top: 5px; }
+        .bids-section h3 { font-size: 1.3rem; margin-bottom: 15px; margin-top: 30px; }
+        .bid-item { background: rgba(15, 23, 42, 0.5); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .bid-info h4 { margin-bottom: 3px; }
+        .bid-price { font-size: 1.3rem; font-weight: 700; color: #22c55e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 Mon Profil</h1>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="window.location.href='browse.html'">Parcourir</button>
+                <button class="btn btn-danger" onclick="logout()">Déconnexion</button>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="avatar">🚗</div>
+                <div class="profile-info">
+                    <h2 id="userName">Utilisateur</h2>
+                    <p id="userEmail">email@example.com</p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="bidCount">0</div>
+                    <div class="stat-label">Enchères placées</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="avgBid">€0</div>
+                    <div class="stat-label">Offre moyenne</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="maxBid">€0</div>
+                    <div class="stat-label">Plus haute offre</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bids-section">
+            <h3>📋 Mes enchères récentes</h3>
+            <div id="bidsList"></div>
+        </div>
+    </div>
+
+    <script>
+        function init() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (!user) { window.location.href = 'index.html'; return; }
+            
+            document.getElementById('userName').textContent = user.name;
+            document.getElementById('userEmail').textContent = user.email;
+            
+            displayBids(user.email);
+        }
+
+        function displayBids(email) {
+            const bids = JSON.parse(localStorage.getItem('bids_' + email) || '[]');
+            
+            document.getElementById('bidCount').textContent = bids.length;
+            
+            if (bids.length === 0) {
+                document.getElementById('bidsList').innerHTML = '<p style="color: #94a3b8;">Aucune enchère placée pour le moment.</p>';
+                return;
+            }
+            
+            const avgPrice = bids.reduce((a, b) => a + b.amount, 0) / bids.length;
+            const maxPrice = Math.max(...bids.map(b => b.amount));
+            
+            document.getElementById('avgBid').textContent = '€' + Math.round(avgPrice).toLocaleString('fr-FR');
+            document.getElementById('maxBid').textContent = '€' + maxPrice.toLocaleString('fr-FR');
+            
+            const html = bids.slice().reverse().map(b => 
+                '<div class="bid-item">' +
+                '<div class="bid-info">' +
+                '<h4>' + b.vehicle + '</h4>' +
+                '<p style="color: #94a3b8; font-size: 0.85rem;">' + new Date(b.date).toLocaleDateString('fr-FR') + '</p>' +
+                '</div>' +
+                '<div class="bid-price">€' + b.amount.toLocaleString('fr-FR') + '</div>' +
+                '</div>'
+            ).join('');
+            
+            document.getElementById('bidsList').innerHTML = html;
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        init();
+    </script>
+</body>
+</html>
