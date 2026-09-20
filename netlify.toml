@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+  command = "echo 'Static site'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  condition = {JsnPath = "/:request.resource/\.html$/"}
