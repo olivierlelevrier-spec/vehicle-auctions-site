@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoris - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .btn { padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn:hover { background: #2563eb; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .listings { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; }
+        .card:hover { border-color: #3b82f6; transform: translateY(-4px); }
+        .image { width: 100%; height: 200px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 15px; }
+        .title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+        .price { font-size: 1.5rem; color: #22c55e; font-weight: 700; }
+        .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❤️ Mes Favoris</h1>
+        <button class="btn" onclick="goBack()">← Retour</button>
+    </div>
+    <div class="container">
+        <div class="listings" id="list"></div>
+        <div id="empty" class="empty" style="display:none"><p>Aucun favori sauvegardé</p></div>
+    </div>
+    <script>
+        const data=[{id:1,title:"BMW M3 2018",price:45000,emoji:"🏎️"},{id:2,title:"Mercedes C63 2020",price:62000,emoji:"⚡"},{id:3,title:"Audi RS6 2019",price:55000,emoji:"🔥"},{id:4,title:"Porsche 911 2017",price:78000,emoji:"💎"},{id:5,title:"Tesla Model S 2021",price:52000,emoji:"⚙️"},{id:6,title:"Range Rover 2019",price:48000,emoji:"👑"}];
+        function init(){const fav=JSON.parse(localStorage.getItem("favorites")||"[]");if(fav.length===0){document.getElementById("empty").style.display="block";return;}const html=fav.map(id=>{const car=data.find(c=>c.id===id);return`<div class="card" onclick="window.location.href='listing-detail.html?id=${id}'"><div class="image">${car.emoji}</div><div class="title">${car.title}</div><div class="price">€${car.price.toLocaleString('fr-FR')}</div></div>`}).join("");document.getElementById("list").innerHTML=html;}
+        function goBack(){window.location.href="browse.html";}
+        init();
+    </script>
+</body>
+</html>
