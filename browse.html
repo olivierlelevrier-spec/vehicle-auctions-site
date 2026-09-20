@@ -98,6 +98,7 @@
         </div>
     </div>
 
+    <div style="max-width: 1200px; margin: 0 auto 30px; display: flex; gap: 15px;"><input type="text" id="search" placeholder="Chercher..." style="flex: 1; padding: 12px; background: rgba(71, 85, 105, 0.3); border: 1px solid #3b82f6; border-radius: 6px; color: white;" oninput="filterListings()"><input type="number" id="maxPrice" placeholder="Prix max..." style="width: 150px; padding: 12px; background: rgba(71, 85, 105, 0.3); border: 1px solid #3b82f6; border-radius: 6px; color: white;" oninput="filterListings()"></div>
     <div class="listings" id="listingsContainer"></div>
 
     <script>
@@ -123,10 +124,11 @@
             
             console.log('User logged in:', currentUser.name);
             document.getElementById('userName').textContent = currentUser.name;
-            displayListings();
+            displayListings(); document.getElementById('search').value = ''; document.getElementById('maxPrice').value = '';;
         }
 
-        function displayListings() {
+        function filterListings(){const s=document.getElementById('search').value.toLowerCase();const p=parseInt(document.getElementById('maxPrice').value)||999999;const filtered=SAMPLE_LISTINGS.filter(l=>l.title.toLowerCase().includes(s) function displayListings()function displayListings() l.price<=p);const container=document.getElementById('listingsContainer');container.innerHTML=filtered.length>0?filtered.map(l=>'<div class="listing-card" onclick="viewListing('+l.id+')"><div class="listing-image">'+l.emoji+'</div><div class="listing-title">'+l.title+'</div><div class="listing-year">Année: '+l.year+'</div><div class="listing-price">€'+l.price.toLocaleString('fr-FR')+'</div><div class="listing-status">Enchère active</div><button class="bid-btn" onclick="event.stopPropagation(); placeBid('+l.id+')">Faire une offre</button></div>').join(''):'<p style="color:#94a3b8; text-align: center; padding: 40px;">Aucun véhicule trouvé</p>'}
+function displayListings(); document.getElementById('search').value = ''; document.getElementById('maxPrice').value = ''; {
             const container = document.getElementById('listingsContainer');
             container.innerHTML = SAMPLE_LISTINGS.map(l => {
                 return '<div class="listing-card" onclick="viewListing(' + l.id + ')">' +
