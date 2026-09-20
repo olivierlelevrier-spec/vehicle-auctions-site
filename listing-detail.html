@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail Annonce - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .back-btn { padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .back-btn:hover { background: #2563eb; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .detail-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+        }
+        .image-section {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            margin-bottom: 30px;
+        }
+        .title-section { margin-bottom: 20px; }
+        .title-section h1 { font-size: 2rem; margin-bottom: 10px; }
+        .price { font-size: 2rem; color: #22c55e; font-weight: 700; }
+        .specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(71, 85, 105, 0.1);
+            border-radius: 8px;
+        }
+        .spec { padding: 10px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .spec:last-child { border-bottom: none; }
+        .spec-label { color: #94a3b8; font-size: 0.9rem; }
+        .spec-value { font-size: 1.2rem; font-weight: 600; }
+        .description {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(71, 85, 105, 0.1);
+            border-left: 4px solid #8b5cf6;
+            border-radius: 4px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .bid-btn {
+            flex: 1;
+            padding: 15px;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .bid-btn:hover { background: #7c3aed; }
+        .favorite-btn {
+            padding: 15px 25px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .favorite-btn:hover { background: #dc2626; }
+        .favorite-btn.added { background: #10b981; }
+        .contact-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(71, 85, 105, 0.1);
+            border-radius: 8px;
+        }
+        .contact-info h3 { margin-bottom: 15px; }
+        .contact-info p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">← Retour</button>
+    </div>
+
+    <div class="container">
+        <div class="detail-card">
+            <div class="image-section" id="emoji"></div>
+
+            <div class="title-section">
+                <h1 id="title"></h1>
+                <div class="price">€<span id="price"></span></div>
+            </div>
+
+            <div class="specs">
+                <div class="spec">
+                    <div class="spec-label">Année</div>
+                    <div class="spec-value" id="year"></div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">État</div>
+                    <div class="spec-value">Excellent</div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Kilométrage</div>
+                    <div class="spec-value" id="mileage"></div>
+                </div>
+                <div class="spec">
+                    <div class="spec-label">Transmission</div>
+                    <div class="spec-value">Automatique</div>
+                </div>
+            </div>
+
+            <div class="description">
+                <h3>À propos de ce véhicule</h3>
+                <p id="description"></p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="bid-btn" onclick="placeBid()">🏆 Faire une offre</button>
+                <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()">❤️ Ajouter aux favoris</button>
+            </div>
+
+            <div class="contact-info">
+                <h3>Informations du vendeur</h3>
+                <p><strong>Nom:</strong> Auto Experts France</p>
+                <p><strong>Téléphone:</strong> +33 1 23 45 67 89</p>
+                <p><strong>Email:</strong> contact@autoexperts.fr</p>
+                <p><strong>Localisation:</strong> Paris, France</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SAMPLE_LISTINGS = [
+            { id: 1, title: 'BMW M3 2018', year: 2018, price: 45000, emoji: '🏎️', mileage: '45,000 km', description: 'BMW M3 2018 en excellent état. Révisions à jour, historique complet. Intérieur cuir, toit panoramique. Parfait pour les amateurs de performance.' },
+            { id: 2, title: 'Mercedes C63 2020', year: 2020, price: 62000, emoji: '⚡', mileage: '28,000 km', description: 'Mercedes-AMG C63 2020 avec tous les équipements. Performance exceptionnelle. Entretien concessionnaire. Garantie restante.' },
+            { id: 3, title: 'Audi RS6 2019', year: 2019, price: 55000, emoji: '🔥', mileage: '35,000 km', description: 'Audi RS6 Avant 2019. Moteur V10 twin-turbo. Très rare. État concours. Tous les services à jour.' },
+            { id: 4, title: 'Porsche 911 2017', year: 2017, price: 78000, emoji: '💎', mileage: '22,000 km', description: 'Porsche 911 Carrera 2017. Classique moderne. Impeccable. Historique complet. Investment piece.' },
+            { id: 5, title: 'Tesla Model S 2021', year: 2021, price: 52000, emoji: '⚙️', mileage: '15,000 km', description: 'Tesla Model S 2021. Électrique haute performance. Batterie longue autonomie. Pilote automatique. État neuf.' },
+            { id: 6, title: 'Range Rover 2019', year: 2019, price: 48000, emoji: '👑', mileage: '38,000 km', description: 'Range Rover 2019. Prestige et confort. Tout équipé. Révisions complètes. Parfait état.' }
+        ];
+
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            const id = parseInt(params.get('id'));
+
+            const listing = SAMPLE_LISTINGS.find(l => l.id === id);
+            if (!listing) {
+                window.location.href = 'browse.html';
+                return;
+            }
+
+            document.getElementById('emoji').textContent = listing.emoji;
+            document.getElementById('title').textContent = listing.title;
+            document.getElementById('price').textContent = listing.price.toLocaleString('fr-FR');
+            document.getElementById('year').textContent = listing.year;
+            document.getElementById('mileage').textContent = listing.mileage;
+            document.getElementById('description').textContent = listing.description;
+
+            checkFavorite(listing.id);
+        }
+
+        function placeBid() {
+            const params = new URLSearchParams(window.location.search);
+            const id = parseInt(params.get('id'));
+            const listing = SAMPLE_LISTINGS.find(l => l.id === id);
+
+            const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
+            if (!newBid) return;
+
+            const bidAmount = parseInt(newBid);
+            if (bidAmount <= listing.price) {
+                alert('Votre offre doit être plus haute que le prix actuel');
+                return;
+            }
+
+            alert('✅ Offre de €' + bidAmount + ' placée!\n\nLe vendeur vous contactera sous peu.');
+        }
+
+        function toggleFavorite() {
+            const params = new URLSearchParams(window.location.search);
+            const id = parseInt(params.get('id'));
+
+            let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            const index = favorites.indexOf(id);
+
+            if (index > -1) {
+                favorites.splice(index, 1);
+                document.getElementById('favoriteBtn').textContent = '❤️ Ajouter aux favoris';
+                document.getElementById('favoriteBtn').classList.remove('added');
+            } else {
+                favorites.push(id);
+                document.getElementById('favoriteBtn').textContent = '❤️ Retiré des favoris';
+                document.getElementById('favoriteBtn').classList.add('added');
+            }
+
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+
+        function checkFavorite(id) {
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            if (favorites.includes(id)) {
+                document.getElementById('favoriteBtn').textContent = '❤️ Retiré des favoris';
+                document.getElementById('favoriteBtn').classList.add('added');
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'browse.html';
+        }
+
+        init();
+    </script>
+</body>
+</html>
