@@ -24,19 +24,9 @@
             border-radius: 12px;
             padding: 40px;
         }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+        h1 { font-size: 1.8rem; margin-bottom: 30px; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; }
         input {
             width: 100%;
             padding: 12px;
@@ -46,11 +36,7 @@
             color: white;
             font-size: 1rem;
         }
-        input:focus {
-            outline: none;
-            border-color: #10b981;
-            background: rgba(15, 23, 42, 0.8);
-        }
+        input:focus { outline: none; border-color: #10b981; background: rgba(15, 23, 42, 0.8); }
         button {
             width: 100%;
             padding: 12px;
@@ -61,59 +47,41 @@
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: #059669;
-        }
-        .link {
-            text-align: center;
             margin-top: 20px;
-            color: #94a3b8;
         }
-        .link a {
-            color: #60a5fa;
-            text-decoration: none;
-        }
-        .link a:hover {
-            text-decoration: underline;
-        }
+        button:hover { background: #059669; }
+        button:disabled { background: #64748b; cursor: not-allowed; }
         .message {
             padding: 12px;
             margin-bottom: 20px;
             border-radius: 6px;
             display: none;
+            font-size: 0.9rem;
         }
-        .error { 
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-        }
-        .success { 
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid #22c55e;
-            color: #86efac;
-        }
+        .error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; }
+        .success { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #86efac; }
+        .link { text-align: center; margin-top: 20px; color: #94a3b8; font-size: 0.9rem; }
+        .link a { color: #60a5fa; text-decoration: none; }
+        .link a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚗 Se connecter</h1>
-        
         <div class="message" id="message"></div>
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email *</label>
                 <input type="email" id="email" required>
             </div>
             
             <div class="form-group">
-                <label for="password">Mot de passe</label>
+                <label for="password">Mot de passe *</label>
                 <input type="password" id="password" required>
             </div>
             
-            <button type="submit">Se connecter</button>
+            <button type="submit" id="submitBtn">Se connecter</button>
         </form>
         
         <div class="link">
@@ -125,7 +93,7 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
             const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -138,6 +106,7 @@
             
             localStorage.setItem('currentUser', JSON.stringify(user));
             showMessage('✅ Connexion réussie!', 'success');
+            document.getElementById('submitBtn').disabled = true;
             
             setTimeout(() => {
                 window.location.href = 'browse.html';
