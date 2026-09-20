@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offre - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; display: flex; align-items: center; justify-content: center; }
+        .modal { background: rgba(30, 41, 59, 0.95); border: 2px solid #8b5cf6; border-radius: 12px; padding: 40px; max-width: 500px; width: 100%; }
+        h1 { font-size: 1.8rem; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input { width: 100%; padding: 12px; background: white; color: #1e293b; border: 2px solid #8b5cf6; border-radius: 6px; }
+        input:focus { outline: none; border-color: #a78bfa; }
+        .info { color: #94a3b8; font-size: 0.9rem; margin-top: 5px; }
+        .display { font-size: 1.3rem; color: #60a5fa; margin-top: 5px; font-weight: 700; }
+        .buttons { display: flex; gap: 10px; margin-top: 30px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .confirm { background: #8b5cf6; color: white; }
+        .confirm:hover { background: #7c3aed; }
+        .cancel { background: #6b7280; color: white; }
+        .cancel:hover { background: #4b5563; }
+        .error { color: #ef4444; display: none; }
+    </style>
+</head>
+<body>
+    <div class="modal">
+        <h1>Placer une offre</h1>
+        <div class="form-group">
+            <label>Montant de votre offre</label>
+            <input type="number" id="bid" placeholder="0">
+            <div class="info">Minimum: EUR<span id="min">0</span></div>
+            <div class="display">EUR<span id="display">0</span></div>
+            <div class="error" id="err"></div>
+        </div>
+        <div class="buttons">
+            <button class="confirm" onclick="submit()">Confirmer</button>
+            <button class="cancel" onclick="back()">Annuler</button>
+        </div>
+    </div>
+    <script>
+        function init(){
+            const p=new URLSearchParams(window.location.search);
+            const id=parseInt(p.get("id"));
+            const data=[{id:1,title:"BMW M3 2018",price:45000},{id:2,title:"Mercedes C63 2020",price:62000},{id:3,title:"Audi RS6 2019",price:55000},{id:4,title:"Porsche 911 2017",price:78000},{id:5,title:"Tesla Model S 2021",price:52000},{id:6,title:"Range Rover 2019",price:48000}];
+            const car=data.find(c=>c.id===id);
+            if(!car){window.location.href="browse.html";return;}
+            const min=car.price+1000;
+            document.getElementById("min").textContent=min.toLocaleString();
+            document.getElementById("bid").value=min;
+            document.getElementById("bid").min=min;
+            document.getElementById("bid").oninput=()=>{document.getElementById("display").textContent=document.getElementById("bid").value||0;const v=parseInt(document.getElementById("bid").value)||0;const err=document.getElementById("err");err.style.display=v<min?"block":"none";}
+            document.getElementById("bid").oninput();
+        }
+        function submit(){const v=parseInt(document.getElementById("bid").value)||0;const min=parseInt(document.getElementById("min").textContent.replace(/,/g,""));if(v<min){alert("Offre insuffisante");return;}alert("Offre de EUR"+v+" acceptée!");const p=new URLSearchParams(window.location.search);window.location.href="listing-detail.html?id="+p.get("id");}
+        function back(){const p=new URLSearchParams(window.location.search);window.location.href="listing-detail.html?id="+p.get("id");}
+        init();
+    </script>
+</body>
+</html>
