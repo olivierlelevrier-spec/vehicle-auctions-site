@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Crédit Auto - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; }
+        .btn:hover { background: #2563eb; }
+        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .panel { background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 25px; border: 2px solid #3b82f6; }
+        .panel h2 { font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #e2e8f0; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #3b82f6; border-radius: 8px; background: white; color: #1e293b; font-size: 0.9rem; }
+        input:focus, select:focus { outline: none; border-color: #60a5fa; }
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { flex: 1; }
+        .slider-value { background: #3b82f6; padding: 8px 12px; border-radius: 6px; min-width: 60px; text-align: center; font-weight: 600; font-size: 0.9rem; }
+        .result-box { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; border-radius: 12px; padding: 25px; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(34, 197, 94, 0.2); }
+        .result-item:last-child { border-bottom: none; }
+        .result-label { color: #cbd5e1; font-size: 0.95rem; }
+        .result-value { font-weight: 600; color: #4ade80; font-size: 1rem; }
+        .monthly-payment { font-size: 2rem; font-weight: 700; color: #22c55e; margin-top: 20px; padding-top: 20px; border-top: 2px solid #22c55e; text-align: center; }
+        .info-box { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px; margin-bottom: 20px; color: #93c5fd; font-size: 0.9rem; }
+        .warning-box { background: rgba(245, 158, 11, 0.1); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin-bottom: 20px; color: #fcd34d; font-size: 0.9rem; }
+        .chart { margin-top: 30px; padding: 20px; background: rgba(30, 41, 59, 0.5); border-radius: 8px; }
+        .chart-item { display: flex; align-items: center; margin-bottom: 15px; }
+        .chart-label { width: 120px; font-size: 0.9rem; }
+        .chart-bar { flex: 1; height: 30px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 4px; margin: 0 15px; position: relative; }
+        .chart-value { width: 100px; text-align: right; font-weight: 600; }
+        .link { text-align: center; margin-top: 20px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+        @media (max-width: 768px) {
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Simulateur Crédit Auto</h1>
+            <a href="browse.html" class="btn">← Retour</a>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Outil d'aide à la décision:</strong> Calculez les mensualités de votre futur crédit auto. Entrez le prix du véhicule, votre apport initial et la durée du crédit.
+        </div>
+
+        <div class="content-grid">
+            <!-- PANNEAU GAUCHE: Paramètres -->
+            <div class="panel">
+                <h2>📊 Paramètres du Crédit</h2>
+
+                <div class="form-group">
+                    <label>Prix du véhicule (€)</label>
+                    <input type="number" id="vehiclePrice" value="25000" min="1000" max="500000" step="1000" oninput="updateSimulation()">
+                    <small style="color: #94a3b8;">Entre €1,000 et €500,000</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Apport initial: <span id="apportValue">10000</span>€</label>
+                    <div class="slider-container">
+                        <input type="range" id="apport" min="0" max="100000" value="10000" step="500" oninput="updateSimulation()">
+                        <div class="slider-value" id="apportDisplay">10000€</div>
+                    </div>
+                    <small style="color: #94a3b8;">Montant que vous avez en banque</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Durée du crédit: <span id="durationValue">60</span> mois</label>
+                    <div class="slider-container">
+                        <input type="range" id="duration" min="12" max="84" value="60" step="6" oninput="updateSimulation()">
+                        <div class="slider-value" id="durationDisplay">60 mois</div>
+                    </div>
+                    <small style="color: #94a3b8;">Entre 1 et 7 ans (12-84 mois)</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Taux d'intérêt annuel (%)</label>
+                    <select id="interestRate" onchange="updateSimulation()">
+                        <option value="2.5">2.5% - Excellent crédit (Banque premium)</option>
+                        <option value="3.5" selected>3.5% - Bon crédit (Taux moyen)</option>
+                        <option value="5.0">5.0% - Crédit normal</option>
+                        <option value="7.0">7.0% - Crédit moins favorable</option>
+                        <option value="9.0">9.0% - Crédit difficile</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Frais d'assurance mensuelle (€)</label>
+                    <input type="number" id="insurance" value="50" min="0" max="500" step="5" oninput="updateSimulation()">
+                    <small style="color: #94a3b8;">Assurance automobile obligatoire</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Frais d'entretien mensuel (€)</label>
+                    <input type="number" id="maintenance" value="30" min="0" max="300" step="5" oninput="updateSimulation()">
+                    <small style="color: #94a3b8;">Révisions, réparations, pneus...</small>
+                </div>
+
+                <div class="info-box" style="background: rgba(34, 197, 94, 0.1); border-left-color: #22c55e; color: #86efac;">
+                    <strong>✅ Budget total mensuel:</strong> Inclut le crédit + assurance + entretien
+                </div>
+            </div>
+
+            <!-- PANNEAU DROIT: Résultats -->
+            <div class="result-box">
+                <h2 style="color: #22c55e; margin-bottom: 20px;">💰 Résultats</h2>
+
+                <div class="result-item">
+                    <span class="result-label">Prix du véhicule</span>
+                    <span class="result-value" id="rPriceDisplay">€25,000</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Apport initial</span>
+                    <span class="result-value" id="rApportDisplay">-€10,000</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Montant à financer</span>
+                    <span class="result-value" id="rLoanAmount">€15,000</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Taux d'intérêt</span>
+                    <span class="result-value" id="rRate">3.5% / an</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Durée</span>
+                    <span class="result-value" id="rDuration">60 mois</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Intérêts totaux</span>
+                    <span class="result-value" id="rTotalInterest">€1,378</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Coût total du crédit</span>
+                    <span class="result-value" id="rTotalCost">€16,378</span>
+                </div>
+
+                <div class="monthly-payment">
+                    <span style="font-size: 0.8rem; display: block; color: #cbd5e1; margin-bottom: 10px;">Mensualité crédit</span>
+                    <span id="monthlyPayment">€273/mois</span>
+                </div>
+
+                <div class="result-item" style="margin-top: 20px; border-top: 2px solid #22c55e;">
+                    <span class="result-label">Assurance mensuelle</span>
+                    <span class="result-value" id="rInsurance">€50</span>
+                </div>
+
+                <div class="result-item">
+                    <span class="result-label">Entretien mensuel</span>
+                    <span class="result-value" id="rMaintenance">€30</span>
+                </div>
+
+                <div class="result-item" style="font-size: 1.1rem;">
+                    <span class="result-label"><strong>BUDGET TOTAL MENSUEL</strong></span>
+                    <span class="result-value" id="rTotalMonthly" style="font-size: 1.3rem;">€353</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAPHIQUE -->
+        <div class="panel">
+            <h2>📈 Répartition des coûts</h2>
+            <div class="chart">
+                <div class="chart-item">
+                    <div class="chart-label">Crédit</div>
+                    <div class="chart-bar" style="width: 60%;"></div>
+                    <div class="chart-value" id="chartCredit">€273</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-label">Assurance</div>
+                    <div class="chart-bar" style="width: 15%; background: linear-gradient(90deg, #06b6d4, #0891b2);"></div>
+                    <div class="chart-value" id="chartInsurance">€50</div>
+                </div>
+                <div class="chart-item">
+                    <div class="chart-label">Entretien</div>
+                    <div class="chart-bar" style="width: 9%; background: linear-gradient(90deg, #22c55e, #16a34a);"></div>
+                    <div class="chart-value" id="chartMaintenance">€30</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONSEILS -->
+        <div class="panel" style="margin-top: 30px;">
+            <h2>💡 Conseils Financiers</h2>
+            <div class="warning-box">
+                <strong>⚠️ Règle de base:</strong> Votre budget mensuel auto ne devrait pas dépasser 25% de vos revenus nets. Par exemple, si vous gagnez €2000/mois net, le maximum recommandé est €500/mois.
+            </div>
+            <div class="info-box">
+                <strong>✅ Meilleur taux:</strong> Plus vous avez un bon apport initial, meilleur sera votre taux. Viser 20-30% du prix du véhicule en apport.
+            </div>
+            <div class="info-box">
+                <strong>✅ Durée optimale:</strong> Entre 48-60 mois pour équilibrer mensualité et coût total. Plus c'est long, plus vous payez d'intérêts.
+            </div>
+        </div>
+
+        <div class="link">
+            <a href="browse.html">← Retour à la navigation</a>
+        </div>
+    </div>
+
+    <script>
+        function updateSimulation() {
+            const vehiclePrice = parseFloat(document.getElementById('vehiclePrice').value) || 0;
+            const apport = parseFloat(document.getElementById('apport').value) || 0;
+            const duration = parseInt(document.getElementById('duration').value) || 60;
+            const rateAnnual = parseFloat(document.getElementById('interestRate').value) || 3.5;
+            const insurance = parseFloat(document.getElementById('insurance').value) || 50;
+            const maintenance = parseFloat(document.getElementById('maintenance').value) || 30;
+
+            // Mise à jour des affichages slider
+            document.getElementById('apportValue').textContent = apport.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('apportDisplay').textContent = apport.toLocaleString('fr-FR', {maximumFractionDigits: 0}) + '€';
+            document.getElementById('durationValue').textContent = duration;
+            document.getElementById('durationDisplay').textContent = duration + ' mois';
+
+            // Calculs
+            const loanAmount = vehiclePrice - apport;
+            const monthlyRate = rateAnnual / 100 / 12;
+
+            // Formule PMT: M = P * [r(1+r)^n] / [(1+r)^n - 1]
+            const monthlyPayment = loanAmount > 0 ?
+                loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, duration)) /
+                (Math.pow(1 + monthlyRate, duration) - 1) : 0;
+
+            const totalPaid = monthlyPayment * duration;
+            const totalInterest = totalPaid - loanAmount;
+            const totalCost = loanAmount + totalInterest;
+            const totalMonthly = monthlyPayment + insurance + maintenance;
+
+            // Affichage résultats
+            document.getElementById('rPriceDisplay').textContent = '€' + vehiclePrice.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('rApportDisplay').textContent = '-€' + apport.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('rLoanAmount').textContent = '€' + loanAmount.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('rRate').textContent = rateAnnual.toFixed(1) + '% / an';
+            document.getElementById('rDuration').textContent = duration + ' mois';
+            document.getElementById('rTotalInterest').textContent = '€' + totalInterest.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('rTotalCost').textContent = '€' + totalCost.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('monthlyPayment').textContent = '€' + monthlyPayment.toLocaleString('fr-FR', {maximumFractionDigits: 0}) + '/mois';
+            document.getElementById('rInsurance').textContent = '€' + insurance.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('rMaintenance').textContent = '€' + maintenance.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('rTotalMonthly').textContent = '€' + totalMonthly.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+
+            // Graphique
+            document.getElementById('chartCredit').textContent = '€' + monthlyPayment.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('chartInsurance').textContent = '€' + insurance.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('chartMaintenance').textContent = '€' + maintenance.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+
+            // Sauvegarder pour utilisation ultérieure
+            localStorage.setItem('creditSimulation', JSON.stringify({
+                vehiclePrice,
+                apport,
+                duration,
+                rateAnnual,
+                monthlyPayment,
+                totalInterest,
+                totalMonthly,
+                timestamp: new Date().toISOString()
+            }));
+        }
+
+        // Initialiser au chargement
+        window.addEventListener('load', () => {
+            updateSimulation();
+        });
+    </script>
+</body>
+</html>
