@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique Véhicule - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #2563eb; }
+        .search-box { background: rgba(30, 41, 59, 0.95); border: 2px solid #3b82f6; border-radius: 12px; padding: 25px; margin-bottom: 30px; }
+        .search-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #3b82f6; border-radius: 8px; background: white; color: #1e293b; font-size: 0.9rem; }
+        input:focus, select:focus { outline: none; border-color: #60a5fa; }
+        .btn-search { width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+        .btn-search:hover { background: #2563eb; }
+        .history-card { background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 25px; margin-bottom: 20px; border-left: 5px solid #3b82f6; }
+        .history-card.warning { border-left-color: #f59e0b; }
+        .history-card.alert { border-left-color: #ef4444; }
+        .history-card.success { border-left-color: #22c55e; }
+        .card-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; }
+        .card-date { color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px; }
+        .card-content { color: #cbd5e1; line-height: 1.6; }
+        .icon { font-size: 1.5rem; margin-right: 10px; }
+        .info-box { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px; margin-bottom: 20px; color: #93c5fd; font-size: 0.9rem; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, #3b82f6, #8b5cf6); }
+        .empty { text-align: center; padding: 40px 20px; color: #94a3b8; }
+        .link { text-align: center; margin-top: 20px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-top: 10px; }
+        .status-ok { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .status-warning { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .status-alert { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📜 Historique Véhicule</h1>
+            <a href="browse.html" class="btn">← Retour</a>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Informations:</strong> Consultez l'historique complet d'un véhicule en entrant son numéro d'immatriculation ou son VIN. Cette vérification est essentielle pour la confiance entre acheteurs et vendeurs.
+        </div>
+
+        <!-- FORMULAIRE DE RECHERCHE -->
+        <div class="search-box">
+            <h2 style="margin-bottom: 20px; color: #60a5fa;">🔍 Chercher un véhicule</h2>
+            <div class="search-group">
+                <div>
+                    <label>Numéro d'immatriculation</label>
+                    <input type="text" id="plate" placeholder="AA-123-BC" style="text-transform: uppercase;">
+                </div>
+                <div>
+                    <label>VIN (optionnel)</label>
+                    <input type="text" id="vin" placeholder="WBADO5C34DB123456">
+                </div>
+            </div>
+            <button class="btn-search" onclick="searchVehicle()">🔍 Rechercher l'historique</button>
+        </div>
+
+        <!-- RÉSULTATS -->
+        <div id="resultsContainer"></div>
+    </div>
+
+    <script>
+        function searchVehicle() {
+            const plate = document.getElementById('plate').value.trim();
+            const vin = document.getElementById('vin').value.trim();
+
+            if (!plate && !vin) {
+                alert('Entrez au moins un numéro d\'immatriculation ou VIN');
+                return;
+            }
+
+            // Simuler une recherche avec données de démonstration
+            const mockHistory = {
+                'AA-123-BC': {
+                    plate: 'AA-123-BC',
+                    brand: 'BMW',
+                    model: 'M3',
+                    year: 2018,
+                    vin: 'WBADO5C34DB123456',
+                    events: [
+                        { type: 'acquisition', date: '2024-09-15', description: 'Acquisition par vendeur actuel', status: 'ok' },
+                        { type: 'ct', date: '2024-06-10', description: 'Contrôle technique: VALIDE', anomalies: [], status: 'ok' },
+                        { type: 'accident', date: '2022-03-20', description: 'Petit accident mineurs (choc arrière faible)', status: 'warning' },
+                        { type: 'revision', date: '2024-02-15', description: 'Révision complète effectuée (45000km)', status: 'ok' },
+                        { type: 'maintenance', date: '2024-01-05', description: 'Changement des freins avant', status: 'ok' },
+                        { type: 'ct', date: '2023-06-12', description: 'Contrôle technique: VALIDE', anomalies: ['Plaquettes usées'], status: 'warning' },
+                        { type: 'maintenance', date: '2023-04-22', description: 'Remplacement pneus 4 roues', status: 'ok' },
+                        { type: 'acquisition', date: '2022-07-10', description: 'Acquisition par propriétaire précédent', status: 'ok' },
+                        { type: 'alert', date: '2022-03-20', description: 'Sinistre déclaré (assurance)', status: 'alert' }
+                    ]
+                },
+                'BB-456-DE': {
+                    plate: 'BB-456-DE',
+                    brand: 'Mercedes',
+                    model: 'C63',
+                    year: 2020,
+                    vin: 'WDB2063481A123456',
+                    events: [
+                        { type: 'acquisition', date: '2024-01-20', description: 'Acquisition par vendeur actuel', status: 'ok' },
+                        { type: 'ct', date: '2024-08-15', description: 'Contrôle technique: VALIDE', anomalies: [], status: 'ok' },
+                        { type: 'revision', date: '2023-11-10', description: 'Révision compète (52000km)', status: 'ok' }
+                    ]
+                }
+            };
+
+            const history = mockHistory[plate];
+            const resultsDiv = document.getElementById('resultsContainer');
+
+            if (!history) {
+                resultsDiv.innerHTML = '<div class="empty">❌ Aucun historique trouvé pour cette immatriculation</div>';
+                return;
+            }
+
+            // Afficher les informations du véhicule
+            let html = `
+                <div style="background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 25px; margin-bottom: 30px; border: 2px solid #3b82f6;">
+                    <h2 style="margin-bottom: 20px;">📋 ${history.brand} ${history.model} (${history.year})</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <strong>Immatriculation:</strong> ${history.plate}
+                        </div>
+                        <div>
+                            <strong>VIN:</strong> ${history.vin}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Timeline des événements
+            html += '<h2 style="margin-bottom: 20px; color: #60a5fa;">⏰ Historique Chronologique</h2>';
+            html += '<div class="timeline">';
+
+            history.events.forEach(event => {
+                const dateObj = new Date(event.date);
+                const formattedDate = dateObj.toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+                let icon = '';
+                let cardClass = '';
+
+                switch (event.type) {
+                    case 'ct': icon = '🔧'; cardClass = event.status === 'ok' ? 'success' : 'warning'; break;
+                    case 'accident': icon = '⚠️'; cardClass = 'alert'; break;
+                    case 'revision': icon = '🔩'; cardClass = 'success'; break;
+                    case 'maintenance': icon = '🛠️'; cardClass = 'success'; break;
+                    case 'acquisition': icon = '🚗'; cardClass = 'success'; break;
+                    case 'alert': icon = '❌'; cardClass = 'alert'; break;
+                    default: icon = '📌'; cardClass = 'success';
+                }
+
+                let statusClass = 'status-' + event.status;
+                let statusText = event.status === 'ok' ? '✓ OK' : (event.status === 'warning' ? '⚠️ Attention' : '❌ Alerte');
+
+                html += `
+                    <div class="history-card ${cardClass}">
+                        <div style="display: flex; align-items: center;">
+                            <span class="icon">${icon}</span>
+                            <div class="card-title">${event.description}</div>
+                        </div>
+                        <div class="card-date">${formattedDate}</div>
+                        ${event.anomalies && event.anomalies.length > 0 ?
+                            '<div class="card-content">Anomalies: ' + event.anomalies.join(', ') + '</div>' : ''}
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+
+            // Avis final
+            const hasAlerts = history.events.some(e => e.status === 'alert');
+            const hasWarnings = history.events.some(e => e.status === 'warning');
+
+            if (hasAlerts) {
+                html += `
+                    <div class="info-box" style="background: rgba(239, 68, 68, 0.1); border-left-color: #ef4444; color: #fca5a5;">
+                        <strong>❌ Alerte Importante:</strong> Ce véhicule a un historique d'accidents. Vérification supplémentaire recommandée avant achat.
+                    </div>
+                `;
+            } else if (hasWarnings) {
+                html += `
+                    <div class="info-box" style="background: rgba(245, 158, 11, 0.1); border-left-color: #f59e0b; color: #fcd34d;">
+                        <strong>⚠️ Points à Vérifier:</strong> Certaines anomalies ou révisions en attente. Contactez le vendeur pour clarification.
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="info-box" style="background: rgba(34, 197, 94, 0.1); border-left-color: #22c55e; color: #86efac;">
+                        <strong>✅ Historique Propre:</strong> Ce véhicule a un bon historique. Idéal pour un achat serein.
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Pré-remplir si une plaque a été scannée avant
+        window.addEventListener('load', () => {
+            const lastPlate = localStorage.getItem('lastScannedPlate');
+            if (lastPlate) {
+                const data = JSON.parse(lastPlate);
+                document.getElementById('plate').value = data.plate;
+                searchVehicle();
+            }
+        });
+    </script>
+
+    <div class="link">
+        <a href="browse.html">← Retour à la navigation</a>
+    </div>
+</body>
+</html>

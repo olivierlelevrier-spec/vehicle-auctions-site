@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Frais de Réparation - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; }
+        .btn:hover { background: #2563eb; }
+        .btn-primary { background: #10b981; }
+        .btn-primary:hover { background: #059669; }
+        .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .panel { background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 25px; border: 2px solid #3b82f6; }
+        .panel h2 { font-size: 1.3rem; margin-bottom: 20px; color: #60a5fa; }
+        .repair-category { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .category-title { font-weight: 600; margin-bottom: 10px; }
+        .repairs-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .repair-item { display: flex; align-items: center; gap: 10px; }
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .repair-label { flex: 1; font-size: 0.9rem; }
+        .repair-price { color: #22c55e; font-weight: 600; font-size: 0.85rem; }
+        .summary-box { background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; border-radius: 12px; padding: 25px; }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(34, 197, 94, 0.2); }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-label { color: #cbd5e1; }
+        .summary-value { font-weight: 600; color: #22c55e; }
+        .total-price { font-size: 1.8rem; font-weight: 700; color: #4ade80; margin-top: 15px; padding-top: 15px; border-top: 2px solid #22c55e; }
+        .info-box { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px; margin-bottom: 15px; color: #93c5fd; font-size: 0.9rem; }
+        .selected-repairs { max-height: 300px; overflow-y: auto; }
+        .repair-item-selected { background: rgba(34, 197, 94, 0.2); padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .remove-btn { background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+        .remove-btn:hover { background: #dc2626; }
+        .link { text-align: center; margin-top: 20px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+        .model-selector { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        select, input { width: 100%; padding: 10px; border: 2px solid #3b82f6; border-radius: 6px; background: white; color: #1e293b; font-size: 0.9rem; }
+        select:focus, input:focus { outline: none; border-color: #60a5fa; }
+        @media (max-width: 768px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .repairs-list { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Calculateur Frais de Réparation</h1>
+            <a href="browse.html" class="btn">← Retour</a>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Conseil:</strong> Sélectionnez les réparations nécessaires selon les anomalies détectées au contrôle technique. Les prix s'ajustent selon votre modèle de véhicule.
+        </div>
+
+        <div class="content-grid">
+            <!-- PANNEAU GAUCHE: Sélection réparations -->
+            <div>
+                <div class="model-selector">
+                    <label>Modèle de véhicule</label>
+                    <select id="model" onchange="updatePrices()">
+                        <option value="basic">Peugeot 308 (référence)</option>
+                        <option value="bmw">BMW M3 (+15%)</option>
+                        <option value="mercedes">Mercedes C63 (+20%)</option>
+                        <option value="audi">Audi RS6 (+18%)</option>
+                        <option value="tesla">Tesla Model S (+25%)</option>
+                    </select>
+                </div>
+
+                <!-- CATÉGORIE 1: Freinage -->
+                <div class="repair-category">
+                    <div class="category-title">🛑 Freinage</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Plaquettes avant" data-price="250" onchange="updateSummary()">
+                            <span class="repair-label">Plaquettes avant</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Plaquettes arrière" data-price="200" onchange="updateSummary()">
+                            <span class="repair-label">Plaquettes arr.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Disques avant" data-price="300" onchange="updateSummary()">
+                            <span class="repair-label">Disques avant</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Disques arrière" data-price="250" onchange="updateSummary()">
+                            <span class="repair-label">Disques arr.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Liquide de frein" data-price="150" onchange="updateSummary()">
+                            <span class="repair-label">Liquide de frein</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 2: Échappement -->
+                <div class="repair-category">
+                    <div class="category-title">💨 Échappement</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Silencieux" data-price="800" onchange="updateSummary()">
+                            <span class="repair-label">Silencieux</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="FAP/Catalyseur" data-price="1200" onchange="updateSummary()">
+                            <span class="repair-label">FAP/Catalyst.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Décalaminage" data-price="350" onchange="updateSummary()">
+                            <span class="repair-label">Décalaminage</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 3: Direction & Suspension -->
+                <div class="repair-category">
+                    <div class="category-title">🔧 Direction & Suspension</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Rotules direction" data-price="600" onchange="updateSummary()">
+                            <span class="repair-label">Rotules direction</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Parallélisme" data-price="200" onchange="updateSummary()">
+                            <span class="repair-label">Parallélisme</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Amortisseur avant" data-price="500" onchange="updateSummary()">
+                            <span class="repair-label">Amortisseur av.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Amortisseur arrière" data-price="450" onchange="updateSummary()">
+                            <span class="repair-label">Amortisseur ar.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Ressort" data-price="350" onchange="updateSummary()">
+                            <span class="repair-label">Ressort</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Biellette direction" data-price="400" onchange="updateSummary()">
+                            <span class="repair-label">Biellette</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 4: Roues & Pneus -->
+                <div class="repair-category">
+                    <div class="category-title">🛞 Roues & Pneus</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="1 Pneu" data-price="150" onchange="updateSummary()">
+                            <span class="repair-label">1 Pneu</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="2 Pneus" data-price="280" onchange="updateSummary()">
+                            <span class="repair-label">2 Pneus</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="4 Pneus" data-price="500" onchange="updateSummary()">
+                            <span class="repair-label">4 Pneus</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Roulements roue" data-price="400" onchange="updateSummary()">
+                            <span class="repair-label">Roulements</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 5: Moteur & Entretien -->
+                <div class="repair-category">
+                    <div class="category-title">⚙️ Moteur & Entretien</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Vidange" data-price="120" onchange="updateSummary()">
+                            <span class="repair-label">Vidange</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Filtre air" data-price="80" onchange="updateSummary()">
+                            <span class="repair-label">Filtre air</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Filtre gasoil" data-price="100" onchange="updateSummary()">
+                            <span class="repair-label">Filtre gasoil</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Courroie distrib." data-price="1500" onchange="updateSummary()">
+                            <span class="repair-label">Courroie distrib.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Courroie accès." data-price="350" onchange="updateSummary()">
+                            <span class="repair-label">Courroie accès.</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Bougies" data-price="200" onchange="updateSummary()">
+                            <span class="repair-label">Bougies</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 6: Électrique -->
+                <div class="repair-category">
+                    <div class="category-title">🔋 Électrique</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Batterie" data-price="400" onchange="updateSummary()">
+                            <span class="repair-label">Batterie</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Démarreur" data-price="600" onchange="updateSummary()">
+                            <span class="repair-label">Démarreur</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Alternateur" data-price="700" onchange="updateSummary()">
+                            <span class="repair-label">Alternateur</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 7: Climatisation -->
+                <div class="repair-category">
+                    <div class="category-title">❄️ Climatisation</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Recharge clim" data-price="250" onchange="updateSummary()">
+                            <span class="repair-label">Recharge clim</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Filtre habitacle" data-price="100" onchange="updateSummary()">
+                            <span class="repair-label">Filtre habitacle</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CATÉGORIE 8: Boîte de vitesse -->
+                <div class="repair-category">
+                    <div class="category-title">⚙️ Boîte de Vitesse</div>
+                    <div class="repairs-list">
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Vidange boîte" data-price="300" onchange="updateSummary()">
+                            <span class="repair-label">Vidange boîte</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Embrayage" data-price="1200" onchange="updateSummary()">
+                            <span class="repair-label">Embrayage</span>
+                        </div>
+                        <div class="repair-item">
+                            <input type="checkbox" data-repair="Volant moteur" data-price="900" onchange="updateSummary()">
+                            <span class="repair-label">Volant moteur</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANNEAU DROIT: Récapitulatif & Total -->
+            <div>
+                <div class="summary-box">
+                    <h2 style="color: #22c55e; margin-bottom: 15px;">📊 Récapitulatif</h2>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Réparations sélectionnées:</span>
+                        <span class="summary-value" id="repairCount">0</span>
+                    </div>
+
+                    <div class="selected-repairs" id="selectedRepairs"></div>
+
+                    <div class="summary-item" style="margin-top: 20px;">
+                        <span class="summary-label">Sous-total:</span>
+                        <span class="summary-value" id="subtotal">€0</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Ajustement modèle:</span>
+                        <span class="summary-value" id="adjustment">+0%</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Main d'œuvre (15%):</span>
+                        <span class="summary-value" id="labor">€0</span>
+                    </div>
+
+                    <div class="total-price">
+                        Total: <span id="totalPrice">€0</span>
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="generateReport()">📋 Générer Rapport</button>
+
+                    <div class="info-box" style="margin-top: 20px;">
+                        <strong>Note:</strong> Les prix incluent pièces + main d'œuvre. Tarifs Vroomly référence. Ajustement selon marque du véhicule.
+                    </div>
+
+                    <div class="info-box" style="background: rgba(245, 158, 11, 0.1); border-left-color: #f59e0b; color: #fcd34d;">
+                        <strong>💡 Conseil vendeur:</strong> Plus les réparations sont incluses dans l'annonce, plus la confiance augmente. Vous pouvez ajouter ces frais à votre prix de base.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="link">
+            <a href="create-listing.html">→ Utiliser dans une annonce</a>
+        </div>
+    </div>
+
+    <script>
+        const modelAdjustments = {
+            'basic': 1,
+            'bmw': 1.15,
+            'mercedes': 1.20,
+            'audi': 1.18,
+            'tesla': 1.25
+        };
+
+        function updatePrices() {
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            let subtotal = 0;
+            let selectedItems = [];
+
+            checkboxes.forEach(cb => {
+                const repair = cb.dataset.repair;
+                let price = parseFloat(cb.dataset.price);
+                const model = document.getElementById('model').value;
+                const adjustment = modelAdjustments[model];
+                price *= adjustment;
+
+                subtotal += price;
+                selectedItems.push({ repair, price });
+            });
+
+            // Afficher items sélectionnés
+            const selectedRepairsDiv = document.getElementById('selectedRepairs');
+            if (selectedItems.length === 0) {
+                selectedRepairsDiv.innerHTML = '<p style="color: #94a3b8; font-size: 0.9rem;">Aucune réparation sélectionnée</p>';
+            } else {
+                selectedRepairsDiv.innerHTML = selectedItems.map((item, idx) => `
+                    <div class="repair-item-selected">
+                        <span>${item.repair}</span>
+                        <span style="color: #22c55e;">€${item.price.toFixed(0)}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Calculs
+            const model = document.getElementById('model').value;
+            const adjustment = modelAdjustments[model];
+            const adjustmentPercent = Math.round((adjustment - 1) * 100);
+            const labor = subtotal * 0.15; // 15% de main d'œuvre
+            const total = subtotal + labor;
+
+            document.getElementById('repairCount').textContent = selectedItems.length;
+            document.getElementById('subtotal').textContent = '€' + subtotal.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('adjustment').textContent = adjustmentPercent > 0 ? '+' + adjustmentPercent + '%' : 'Réf.';
+            document.getElementById('labor').textContent = '€' + labor.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+            document.getElementById('totalPrice').textContent = '€' + total.toLocaleString('fr-FR', {maximumFractionDigits: 0});
+
+            // Sauvegarder pour utilisation ultérieure
+            localStorage.setItem('repairCosts', JSON.stringify({
+                subtotal,
+                labor,
+                total,
+                repairs: selectedItems,
+                model,
+                timestamp: new Date().toISOString()
+            }));
+        }
+
+        function generateReport() {
+            const costs = JSON.parse(localStorage.getItem('repairCosts') || '{}');
+            if (!costs.repairs || costs.repairs.length === 0) {
+                alert('Sélectionnez au moins une réparation');
+                return;
+            }
+
+            let report = `
+RAPPORT DE FRAIS DE RÉPARATION
+===============================
+Généré le: ${new Date().toLocaleDateString('fr-FR')}
+
+RÉPARATIONS À EFFECTUER:
+`;
+            costs.repairs.forEach(r => {
+                report += `\n- ${r.repair}: €${r.price.toFixed(0)}`;
+            });
+
+            report += `
+
+CALCUL TOTAL:
+- Sous-total pièces + travaux: €${costs.subtotal.toFixed(0)}
+- Main d'œuvre (15%): €${costs.labor.toFixed(0)}
+- TOTAL FRAIS: €${costs.total.toFixed(0)}
+
+CONSEIL: Ajoutez ce montant au prix de base pour votre annonce.
+`;
+
+            alert(report);
+            console.log(report);
+        }
+
+        // Initialiser au chargement
+        window.addEventListener('load', () => {
+            updateSummary();
+        });
+    </script>
+</body>
+</html>
