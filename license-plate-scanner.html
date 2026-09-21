@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Immatriculation - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: rgba(30, 41, 59, 0.95); border: 2px solid #ec4899; border-radius: 12px; padding: 40px; }
+        h1 { font-size: 2rem; margin-bottom: 30px; text-align: center; color: #ec4899; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #e2e8f0; }
+        input, textarea { width: 100%; padding: 14px; border: 2px solid #ec4899; border-radius: 8px; background: white; color: #1e293b; font-size: 1rem; }
+        input::placeholder, textarea::placeholder { color: #94a3b8; }
+        input:focus, textarea:focus { outline: none; border-color: #f472b6; background: #fce7f3; }
+        textarea { resize: vertical; min-height: 80px; font-family: monospace; }
+        button { width: 100%; padding: 14px; background: #ec4899; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #db2777; }
+        .message { padding: 12px; margin-bottom: 20px; border-radius: 6px; display: none; font-size: 0.9rem; font-weight: 600; }
+        .error { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+        .success { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+        .result-box { background: rgba(236, 72, 153, 0.1); border: 2px solid #ec4899; border-radius: 12px; padding: 25px; margin-top: 30px; display: none; }
+        .result-box.show { display: block; }
+        .result-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(236, 72, 153, 0.2); }
+        .result-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .result-label { color: #94a3b8; font-size: 0.9rem; }
+        .result-value { font-size: 1.1rem; font-weight: 600; color: #f472b6; }
+        .plate-preview { background: #FFD700; color: #000; padding: 8px 12px; border-radius: 4px; font-family: monospace; font-weight: 700; text-align: center; font-size: 1.2rem; margin-top: 10px; letter-spacing: 2px; }
+        .link { text-align: center; margin-top: 20px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+        .hint { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 12px; border-radius: 6px; color: #93c5fd; font-size: 0.9rem; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Scanner Immatriculation</h1>
+        <p style="text-align: center; color: #94a3b8; margin-bottom: 30px;">Identifiez automatiquement le véhicule à partir de sa plaque</p>
+
+        <div class="message" id="message"></div>
+
+        <form id="scannerForm">
+            <div class="form-group">
+                <label>Numéro d'immatriculation *</label>
+                <input type="text" id="plate" placeholder="AA-123-BC ou AA 123 BC" required style="text-transform: uppercase; letter-spacing: 1px;">
+                <div class="hint">Format: lettres-chiffres-lettres (France) ou autre format international</div>
+            </div>
+
+            <div class="form-group">
+                <label>Ou: Copiez le texte de la photo</label>
+                <textarea id="plateText" placeholder="Collez le texte OCR ici si vous avez une photo de la plaque..."></textarea>
+            </div>
+
+            <button type="submit">🔍 Analyser la plaque</button>
+        </form>
+
+        <div class="result-box" id="resultBox">
+            <div style="font-size: 1.3rem; font-weight: 600; margin-bottom: 20px; color: #f472b6;">Informations du Véhicule</div>
+
+            <div class="result-item">
+                <div class="result-label">Numéro d'immatriculation</div>
+                <div class="plate-preview" id="platePreview">AA-123-BC</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Marque (estimée)</div>
+                <div class="result-value" id="estimatedBrand">À compléter</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Format de plaque</div>
+                <div class="result-value" id="plateFormat">France</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Prochaines étapes</div>
+                <div class="result-value" style="font-size: 0.95rem; line-height: 1.6;">
+                    ✅ Vérifier les données <br>
+                    ✅ Compléter les informations du véhicule <br>
+                    ✅ Ajouter des photos <br>
+                    ✅ Publier l'annonce
+                </div>
+            </div>
+
+            <a href="create-listing.html" style="display: block; margin-top: 20px; padding: 12px; background: #ec4899; color: white; text-decoration: none; text-align: center; border-radius: 6px; font-weight: 600;">Créer une annonce avec ces infos →</a>
+        </div>
+
+        <div class="link">
+            <a href="browse.html">← Retour</a>
+        </div>
+    </div>
+
+    <script>
+        // Base de données simple des marques par plaque (simulation)
+        const vehicleDatabase = {
+            'BMW': { brand: 'BMW', country: 'Allemagne', luxury: true },
+            'MERC': { brand: 'Mercedes-Benz', country: 'Allemagne', luxury: true },
+            'AUDI': { brand: 'Audi', country: 'Allemagne', luxury: true },
+            'PORSCHE': { brand: 'Porsche', country: 'Allemagne', luxury: true },
+            'VW': { brand: 'Volkswagen', country: 'Allemagne', luxury: false },
+            'TESLA': { brand: 'Tesla', country: 'USA', luxury: true },
+            'PEUGEOT': { brand: 'Peugeot', country: 'France', luxury: false },
+            'RENAULT': { brand: 'Renault', country: 'France', luxury: false },
+            'CITROEN': { brand: 'Citroën', country: 'France', luxury: false }
+        };
+
+        function extractPlateNumber(input) {
+            // Normaliser et valider le format
+            const cleaned = input.toUpperCase().replace(/[\s\-]/g, '');
+
+            // Format France: 2 lettres + 3 chiffres + 2 lettres = 7 caractères
+            const frenchFormat = /^[A-Z]{2}\d{3}[A-Z]{2}$/;
+
+            if (frenchFormat.test(cleaned)) {
+                return {
+                    raw: cleaned,
+                    formatted: cleaned.substring(0, 2) + '-' + cleaned.substring(2, 5) + '-' + cleaned.substring(5),
+                    format: 'France (nouveau)',
+                    valid: true
+                };
+            }
+
+            // Ancien format France: 3 lettres + 3 chiffres + 2 lettres
+            const oldFrench = /^[A-Z]{3}\d{3}[A-Z]{2}$/;
+            if (oldFrench.test(cleaned)) {
+                return {
+                    raw: cleaned,
+                    formatted: cleaned.substring(0, 3) + ' ' + cleaned.substring(3, 6) + ' ' + cleaned.substring(6),
+                    format: 'France (ancien)',
+                    valid: true
+                };
+            }
+
+            return { valid: false, formatted: null };
+        }
+
+        function identifyVehicle(plate) {
+            // Essayer de trouver une marque connue dans la base de données
+            for (const [key, data] of Object.entries(vehicleDatabase)) {
+                if (plate.includes(key)) {
+                    return data.brand;
+                }
+            }
+            return 'À identifier dans le formulaire';
+        }
+
+        document.getElementById('scannerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let plateInput = document.getElementById('plate').value.trim();
+            const plateText = document.getElementById('plateText').value.trim();
+
+            // Si le champ plate est vide, essayer d'extraire du texte OCR
+            if (!plateInput && plateText) {
+                plateInput = plateText.match(/[A-Z0-9\-\s]{6,10}/)?.[0] || '';
+            }
+
+            if (!plateInput) {
+                showMessage('Entrez un numéro d\'immatriculation', 'error');
+                return;
+            }
+
+            const result = extractPlateNumber(plateInput);
+            if (!result.valid) {
+                showMessage('Format d\'immatriculation non reconnu. Utilisez: AA-123-BC ou AA 123 BC', 'error');
+                return;
+            }
+
+            // Afficher les résultats
+            document.getElementById('platePreview').textContent = result.formatted;
+            document.getElementById('plateFormat').textContent = result.format;
+            document.getElementById('estimatedBrand').textContent = identifyVehicle(result.raw);
+            document.getElementById('resultBox').classList.add('show');
+
+            // Sauvegarder pour utilisation ultérieure
+            localStorage.setItem('lastScannedPlate', JSON.stringify({
+                plate: result.formatted,
+                format: result.format,
+                timestamp: new Date().toISOString()
+            }));
+
+            showMessage('✅ Plaque validée! Utilisez ces informations pour créer une annonce.', 'success');
+        });
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            msg.style.display = 'block';
+        }
+
+        // Pré-remplir si une plaque a été scannée avant
+        window.addEventListener('load', () => {
+            const lastPlate = localStorage.getItem('lastScannedPlate');
+            if (lastPlate) {
+                const data = JSON.parse(lastPlate);
+                document.getElementById('plate').value = data.plate;
+            }
+        });
+    </script>
+</body>
+</html>

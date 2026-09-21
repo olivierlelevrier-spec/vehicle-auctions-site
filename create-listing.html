@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer Annonce - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: rgba(30, 41, 59, 0.95); border: 2px solid #22c55e; border-radius: 12px; padding: 40px; }
+        h1 { font-size: 1.8rem; margin-bottom: 30px; text-align: center; }
+        .section { margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        .section:last-of-type { border-bottom: none; }
+        .section-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; color: #22c55e; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #e2e8f0; }
+        input, textarea, select { width: 100%; padding: 14px; border: 2px solid #22c55e; border-radius: 8px; background: white; color: #1e293b; font-size: 1rem; font-weight: 500; }
+        input::placeholder, textarea::placeholder { color: #94a3b8; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: #86efac; background: #f0fdf4; }
+        textarea { resize: vertical; min-height: 100px; }
+        button { width: 100%; padding: 14px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #16a34a; }
+        .message { padding: 12px; margin-bottom: 20px; border-radius: 6px; display: none; font-size: 0.9rem; font-weight: 600; }
+        .error { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+        .success { background: #dcfce7; color: #166534; border: 2px solid #22c55e; }
+        .link { text-align: center; margin-top: 20px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+        .photo-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .photo-item { width: 100%; aspect-ratio: 1; background: rgba(71, 85, 105, 0.3); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; border: 2px dashed #22c55e; overflow: hidden; position: relative; }
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-item:hover { border-color: #86efac; background: rgba(34, 197, 94, 0.1); }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .checkbox-item { display: flex; align-items: center; }
+        .checkbox-item input { width: 20px; height: 20px; margin-right: 8px; }
+        .checkbox-item label { margin: 0; display: inline; }
+        .photo-remove { position: absolute; cursor: pointer; background: #ef4444; padding: 2px 6px; border-radius: 3px; font-size: 0.8rem; display: none; }
+        .photo-item:hover .photo-remove { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Créer une Annonce Complète</h1>
+        <div class="message" id="message"></div>
+        <form id="createListingForm">
+            <!-- SECTION 1: INFORMATIONS DE BASE -->
+            <div class="section">
+                <div class="section-title">📋 Informations du Véhicule</div>
+                <div class="form-group">
+                    <label>Titre de l'annonce *</label>
+                    <input type="text" id="title" placeholder="BMW M3 2018" required>
+                </div>
+                <div class="form-group">
+                    <label>Prix (EUR) *</label>
+                    <input type="number" id="price" placeholder="45000" required min="1000">
+                </div>
+                <div class="form-group">
+                    <label>Année *</label>
+                    <input type="number" id="year" placeholder="2018" required min="1990" max="2026">
+                </div>
+                <div class="form-group">
+                    <label>Kilométrage (km) *</label>
+                    <input type="number" id="mileage" placeholder="45000" required min="0">
+                </div>
+                <div class="form-group">
+                    <label>Emoji (représentation) *</label>
+                    <input type="text" id="emoji" placeholder="🏎️" maxlength="2" required>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="description" placeholder="Décrivez votre véhicule en détail..." required></textarea>
+                </div>
+            </div>
+
+            <!-- SECTION 2: PHOTOS -->
+            <div class="section">
+                <div class="section-title">📸 Photos (max 5)</div>
+                <label>Cliquez sur le + pour ajouter des photos</label>
+                <div class="photo-gallery" id="photoGallery">
+                    <div class="photo-item" onclick="document.getElementById('photoInput').click()">+</div>
+                </div>
+                <input type="file" id="photoInput" accept="image/*" style="display:none;">
+            </div>
+
+            <!-- SECTION 3: CONTRÔLE TECHNIQUE -->
+            <div class="section">
+                <div class="section-title">🔧 Contrôle Technique</div>
+                <div class="form-group">
+                    <label>Date du dernier CT</label>
+                    <input type="date" id="ctDate">
+                </div>
+                <div class="form-group">
+                    <label>État du CT</label>
+                    <select id="ctValidity">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="valid">Valide (moins de 6 mois)</option>
+                        <option value="soon">Expire bientôt (6-12 mois)</option>
+                        <option value="expired">Expiré</option>
+                        <option value="none">Pas de CT effectué</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Anomalies détectées au CT</label>
+                    <textarea id="ctAnomalies" placeholder="Décrivez les défauts trouvés..."></textarea>
+                </div>
+            </div>
+
+            <!-- SECTION 4: FRAIS -->
+            <div class="section">
+                <div class="section-title">💰 Frais et Maintenance</div>
+                <div class="form-group">
+                    <label>Frais déjà réalisés (EUR)</label>
+                    <input type="number" id="costsDone" placeholder="Ex: 2500" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Détails des frais réalisés</label>
+                    <textarea id="costsDoneDetails" placeholder="Révision moteur: 800EUR, Pneus: 400EUR..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Frais prévisionnels (EUR)</label>
+                    <input type="number" id="costsPlanned" placeholder="Ex: 1500" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Détails des frais à prévoir</label>
+                    <textarea id="costsPlannedDetails" placeholder="Freins: 600EUR, Batterie: 200EUR..."></textarea>
+                </div>
+            </div>
+
+            <!-- SECTION 5: ÉTAT GÉNÉRAL -->
+            <div class="section">
+                <div class="section-title">⚙️ État Général du Véhicule</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="interior" />
+                        <label for="interior">Intérieur en bon état</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="exterior" />
+                        <label for="exterior">Extérieur en bon état</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="engine" />
+                        <label for="engine">Moteur fiable</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="transmission" />
+                        <label for="transmission">Transmission OK</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">✅ Publier l'annonce</button>
+        </form>
+        <div class="link">
+            <a href="browse.html">← Retour</a>
+        </div>
+    </div>
+
+    <script>
+        let photos = [];
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (photos.length >= 5) { alert('Maximum 5 photos'); return; }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                photos.push(event.target.result);
+                updatePhotoGallery();
+            };
+            reader.readAsDataURL(file);
+        });
+        function updatePhotoGallery() {
+            const gallery = document.getElementById('photoGallery');
+            let html = photos.map((p, i) => `<div class="photo-item"><img src="${p}"/><span class="photo-remove" onclick="removePhoto(${i})">X</span></div>`).join('');
+            if (photos.length < 5) html += '<div class="photo-item" onclick="document.getElementById(\'photoInput\').click()">+</div>';
+            gallery.innerHTML = html;
+        }
+        function removePhoto(index) { photos.splice(index, 1); updatePhotoGallery(); }
+        document.getElementById('createListingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const price = parseInt(document.getElementById('price').value);
+            const year = parseInt(document.getElementById('year').value);
+            const mileage = parseInt(document.getElementById('mileage').value);
+            const emoji = document.getElementById('emoji').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const currentUserStr = localStorage.getItem('currentUser');
+            const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+            if (!currentUser) { showMessage('Connexion requise', 'error'); setTimeout(() => { window.location.href = 'login.html'; }, 1500); return; }
+            if (!title || !price || !year || !mileage || !emoji || !description) { showMessage('Remplissez les champs obligatoires', 'error'); return; }
+            const myListings = JSON.parse(localStorage.getItem('myListings_' + currentUser.email) || '[]');
+            const newListing = {
+                id: Date.now(), title, price, year, mileage, emoji, description, photos: photos,
+                ct: { date: document.getElementById('ctDate').value, validity: document.getElementById('ctValidity').value, anomalies: document.getElementById('ctAnomalies').value },
+                costs: { done: parseInt(document.getElementById('costsDone').value || 0), doneDetails: document.getElementById('costsDoneDetails').value, planned: parseInt(document.getElementById('costsPlanned').value || 0), plannedDetails: document.getElementById('costsPlannedDetails').value },
+                condition: { interior: document.getElementById('interior').checked, exterior: document.getElementById('exterior').checked, engine: document.getElementById('engine').checked, transmission: document.getElementById('transmission').checked },
+                createdBy: currentUser.email, createdAt: new Date().toISOString()
+            };
+            myListings.push(newListing);
+            localStorage.setItem('myListings_' + currentUser.email, JSON.stringify(myListings));
+            showMessage('Annonce publiée! Redirection...', 'success');
+            setTimeout(() => { window.location.href = 'my-listings.html'; }, 1500);
+        });
+        function showMessage(text, type) { const msg = document.getElementById('message'); msg.textContent = text; msg.className = 'message ' + type; msg.style.display = 'block'; }
+    </script>
+</body>
+</html>

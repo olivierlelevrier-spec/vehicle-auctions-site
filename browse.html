@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcourir - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        h1 { font-size: 2rem; }
+        .user-info {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 12px 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(71, 85, 105, 0.3);
+        }
+        .logout-btn {
+            margin-left: 20px;
+            padding: 8px 16px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .logout-btn:hover { background: #dc2626; }
+        .listings {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .listing-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.3s, border-color 0.3s;
+            cursor: pointer;
+        }
+        .listing-card:hover {
+            transform: translateY(-4px);
+            border-color: #3b82f6;
+        }
+        .listing-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            object-fit: cover;
+            background-size: cover;
+            background-position: center;
+        }
+        .listing-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+        .listing-year { color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; }
+        .listing-price { font-size: 1.5rem; font-weight: 700; color: #22c55e; margin-bottom: 15px; }
+        .listing-status { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #86efac; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 15px; display: inline-block; }
+        .bid-btn { width: 100%; padding: 12px; background: #8b5cf6; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .bid-btn:hover { background: #7c3aed; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state h2 { color: #94a3b8; margin-bottom: 20px; }
+        .empty-state p { color: #64748b; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚗 Parcourir les enchères</h1>
+        <div class="user-info">
+            <span id="userName">Utilisateur</span>
+            <button class="logout-btn" onclick="window.location.href='messages.html'" style="background: #6366f1;">💬 Messages</button>
+            <button class="logout-btn" onclick="window.location.href='notifications.html'" style="background: #ef4444;">🔔 Notifications</button>
+            <button class="logout-btn" onclick="window.location.href='favorites.html'" style="background: #8b5cf6;">❤️ Favoris</button>
+            <button class="logout-btn" onclick="window.location.href='my-listings.html'" style="background: #f59e0b;">📋 Mes Annonces</button>
+            <button class="logout-btn" onclick="logout()">Déconnexion</button>
+        </div>
+    </div>
+
+    <!-- OUTILS VENDEUR & ACHETEUR -->
+    <div style="max-width: 1200px; margin: 0 auto 30px;">
+        <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; border-radius: 12px; padding: 20px; margin-bottom: 15px;">
+            <h3 style="margin-bottom: 15px; color: #a78bfa;">🛠️ Outils Vendeur & IA</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+                <button class="logout-btn" onclick="window.location.href='license-plate-scanner.html'" style="background: #ec4899;">📋 Scanner Plaque</button>
+                <button class="logout-btn" onclick="window.location.href='photo-analyzer.html'" style="background: #06b6d4;">📸 Analyser Photos</button>
+                <button class="logout-btn" onclick="window.location.href='auto-price-estimator.html'" style="background: #8b5cf6;">💰 Estimateur Prix</button>
+                <button class="logout-btn" onclick="window.location.href='repair-cost-calculator.html'" style="background: #f59e0b;">🔧 Coûts Réparation</button>
+                <button class="logout-btn" onclick="window.location.href='seller-dashboard.html'" style="background: #22c55e;">📊 Dashboard</button>
+                <button class="logout-btn" onclick="window.location.href='seller-guide.html'" style="background: #3b82f6;">📚 Guide Vendeur</button>
+            </div>
+        </div>
+        <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; border-radius: 12px; padding: 20px;">
+            <h3 style="margin-bottom: 15px; color: #86efac;">🔍 Outils Acheteur</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+                <button class="logout-btn" onclick="window.location.href='vehicle-history.html'" style="background: #22c55e;">📜 Historique Véhicule</button>
+                <button class="logout-btn" onclick="window.location.href='credit-simulator.html'" style="background: #06b6d4;">💳 Simulateur Crédit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="listings" id="listingsContainer"></div>
+    <div id="emptyState" style="display:none;"></div>
+
+    <script src="photo-data.js"></script>
+    <script src="listings-data.js"></script>
+    <script>
+        function init() {
+            const currentUserStr = localStorage.getItem('currentUser');
+            const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+            if (!currentUser || !currentUser.name) window.location.href = 'index.html';
+            else { document.getElementById('userName').textContent = currentUser.name; displayListings(); updateNotificationBadge(currentUser); }
+        }
+
+        function updateNotificationBadge(user) {
+            const notifKey = 'notifications_' + user.email;
+            const notifications = JSON.parse(localStorage.getItem(notifKey) || '[]');
+            const count = notifications.length;
+            if (count > 0) { document.getElementById('notifCount').style.display = 'inline-flex'; document.getElementById('notifCount').textContent = count; }
+        }
+
+        function displayListings() {
+            const container = document.getElementById('listingsContainer');
+
+            if (!REAL_LISTINGS || REAL_LISTINGS.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('emptyState').innerHTML = '<div class="empty-state"><h2>📭 Aucune annonce disponible</h2><p>Les vendeurs ajouteront leurs véhicules bientôt!</p></div>';
+                return;
+            }
+
+            container.innerHTML = REAL_LISTINGS.map(l => {
+                const firstPhoto = l.photos && l.photos.length > 0 ? l.photos[0] : l.emoji;
+                const bgStyle = firstPhoto.startsWith('data:') ? `background-image: url('${firstPhoto}');` : '';
+                return '<div class="listing-card" onclick="viewListing(' + l.id + ')">' +
+                    '<div class="listing-image" style="' + bgStyle + '">' + (bgStyle ? '' : l.emoji) + '</div>' +
+                    '<div class="listing-title">' + l.title + '</div>' +
+                    '<div class="listing-year">Année: ' + l.year + ' | ' + (l.mileage ? l.mileage.toLocaleString('fr-FR') + ' km' : '') + '</div>' +
+                    '<div class="listing-price">€' + l.price.toLocaleString('fr-FR') + '</div>' +
+                    '<div class="listing-status">Enchère active</div>' +
+                    '<button class="bid-btn" onclick="event.stopPropagation(); placeBid(' + l.id + ')">Faire une offre</button>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function viewListing(id) {
+            window.location.href = 'listing-detail.html?id=' + id;
+        }
+
+        function placeBid(id) {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const listing = REAL_LISTINGS.find(l => l.id === id);
+            const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
+
+            if (!newBid) return;
+            const bidAmount = parseInt(newBid);
+
+            if (bidAmount <= listing.price) {
+                alert('Votre offre doit être plus haute que le prix actuel');
+                return;
+            }
+
+            alert('Offre de €' + bidAmount + ' placée pour ' + listing.title + '!\n\nAu meilleur compte pour: ' + currentUser.name);
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        init();
+    </script>
+</body>
+</html>

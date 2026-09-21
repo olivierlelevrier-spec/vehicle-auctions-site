@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimateur de Prix - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: rgba(30, 41, 59, 0.95); border: 2px solid #8b5cf6; border-radius: 12px; padding: 40px; }
+        h1 { font-size: 2rem; margin-bottom: 30px; text-align: center; color: #8b5cf6; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #e2e8f0; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #8b5cf6; border-radius: 8px; background: white; color: #1e293b; font-size: 1rem; }
+        input:focus, select:focus { outline: none; border-color: #a78bfa; background: #f5f3ff; }
+        .slider-container { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { flex: 1; }
+        .slider-value { background: #8b5cf6; padding: 8px 12px; border-radius: 6px; min-width: 80px; text-align: center; font-weight: 600; }
+        .button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        button { padding: 15px; background: #8b5cf6; color: white; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+        button:hover { background: #7c3aed; }
+        button.secondary { background: #3b82f6; }
+        button.secondary:hover { background: #2563eb; }
+        .result-box { background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; border-radius: 12px; padding: 25px; margin-top: 30px; display: none; }
+        .result-box.show { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .result-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; color: #a78bfa; }
+        .price-estimation { font-size: 2.5rem; font-weight: 700; color: #22c55e; margin: 20px 0; }
+        .price-range { color: #94a3b8; font-size: 0.95rem; margin-bottom: 15px; }
+        .market-comparison { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .comparison-item { background: rgba(59, 130, 246, 0.2); padding: 15px; border-radius: 8px; text-align: center; }
+        .comparison-label { color: #94a3b8; font-size: 0.85rem; }
+        .comparison-value { font-size: 1.5rem; font-weight: 700; color: #3b82f6; margin-top: 5px; }
+        .advice { background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 15px; border-radius: 6px; margin-top: 15px; color: #86efac; font-size: 0.95rem; }
+        .advice.warning { background: rgba(245, 158, 11, 0.1); border-left-color: #f59e0b; color: #fcd34d; }
+        .advice.alert { background: rgba(239, 68, 68, 0.1); border-left-color: #ef4444; color: #fca5a5; }
+        .link { text-align: center; margin-top: 20px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 Estimateur de Prix</h1>
+        <p style="text-align: center; color: #94a3b8; margin-bottom: 30px;">Obtenez une estimation du prix de marché basée sur les données du véhicule</p>
+
+        <form id="estimatorForm">
+            <div class="form-group">
+                <label>Marque & Modèle *</label>
+                <select id="model" required>
+                    <option value="">-- Sélectionner --</option>
+                    <option value="bmw-m3">BMW M3</option>
+                    <option value="mercedes-c63">Mercedes C63</option>
+                    <option value="audi-rs6">Audi RS6</option>
+                    <option value="porsche-911">Porsche 911</option>
+                    <option value="tesla-model-s">Tesla Model S</option>
+                    <option value="range-rover">Range Rover</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Année: <span id="yearValue">2020</span></label>
+                <div class="slider-container">
+                    <input type="range" id="year" min="1990" max="2026" value="2020" oninput="updateYear(this.value)">
+                    <div class="slider-value" id="yearDisplay">2020</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Kilométrage: <span id="kmValue">50000</span> km</label>
+                <div class="slider-container">
+                    <input type="range" id="mileage" min="0" max="300000" value="50000" step="5000" oninput="updateMileage(this.value)">
+                    <div class="slider-value" id="kmDisplay">50,000 km</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>État du Contrôle Technique</label>
+                <select id="ctStatus">
+                    <option value="valid">Valide (moins de 6 mois)</option>
+                    <option value="soon">Expire bientôt (6-12 mois)</option>
+                    <option value="expired">Expiré</option>
+                    <option value="none">Pas de CT</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>État général (1-5)</label>
+                <select id="condition">
+                    <option value="5">5 - Excellent (neuf/quasi-neuf)</option>
+                    <option value="4">4 - Très bon (peu d'usure)</option>
+                    <option value="3">3 - Bon (usure normale)</option>
+                    <option value="2">2 - Correct (défauts visibles)</option>
+                    <option value="1">1 - Mauvais (nombreux défauts)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Frais réalisés et prévus (EUR)</label>
+                <input type="number" id="totalCosts" placeholder="0" min="0" value="0">
+            </div>
+
+            <div class="button-group">
+                <button type="submit">📊 Estimer le prix</button>
+                <button type="reset" class="secondary">🔄 Réinitialiser</button>
+            </div>
+        </form>
+
+        <div class="result-box" id="resultBox">
+            <div class="result-title">Estimation de Prix</div>
+            <div class="price-estimation" id="estimatedPrice">€45,000</div>
+            <div class="price-range" id="priceRange">Plage estimée: €43,500 - €46,500</div>
+
+            <div class="market-comparison">
+                <div class="comparison-item">
+                    <div class="comparison-label">Prix Minimal</div>
+                    <div class="comparison-value" id="minPrice">€40K</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">Prix Optimal</div>
+                    <div class="comparison-value" id="optimalPrice">€45K</div>
+                </div>
+                <div class="comparison-item">
+                    <div class="comparison-label">Prix Maximal</div>
+                    <div class="comparison-value" id="maxPrice">€50K</div>
+                </div>
+            </div>
+
+            <div id="adviceContainer"></div>
+        </div>
+
+        <div class="link">
+            <a href="browse.html">← Retour à l'accueil</a>
+        </div>
+    </div>
+
+    <script>
+        const basePrices = {
+            'bmw-m3': 45000,
+            'mercedes-c63': 62000,
+            'audi-rs6': 55000,
+            'porsche-911': 78000,
+            'tesla-model-s': 52000,
+            'range-rover': 48000
+        };
+
+        function updateYear(value) {
+            document.getElementById('yearValue').textContent = value;
+            document.getElementById('yearDisplay').textContent = value;
+        }
+
+        function updateMileage(value) {
+            const formatted = parseInt(value).toLocaleString('fr-FR');
+            document.getElementById('kmValue').textContent = formatted;
+            document.getElementById('kmDisplay').textContent = formatted + ' km';
+        }
+
+        function calculatePrice() {
+            const model = document.getElementById('model').value;
+            const year = parseInt(document.getElementById('year').value);
+            const mileage = parseInt(document.getElementById('mileage').value);
+            const ctStatus = document.getElementById('ctStatus').value;
+            const condition = parseInt(document.getElementById('condition').value);
+            const totalCosts = parseInt(document.getElementById('totalCosts').value || 0);
+
+            if (!model) { alert('Sélectionnez un modèle'); return; }
+
+            const basePrice = basePrices[model];
+            const currentYear = 2026;
+            const age = currentYear - year;
+
+            // Dépréciation par année (8% par an)
+            let depreciationFactor = Math.pow(0.92, age);
+
+            // Dépréciation par kilométrage (0.005 EUR par km)
+            let mileageDeduction = mileage * 0.005;
+
+            // Ajustement CT
+            let ctAdjustment = 0;
+            if (ctStatus === 'expired') ctAdjustment = -1500;
+            else if (ctStatus === 'soon') ctAdjustment = -500;
+            else if (ctStatus === 'none') ctAdjustment = -2000;
+
+            // Ajustement état général
+            const conditionFactor = condition / 5;
+
+            // Prix estimé
+            let estimatedPrice = (basePrice * depreciationFactor * conditionFactor) - mileageDeduction + ctAdjustment + totalCosts;
+            estimatedPrice = Math.round(estimatedPrice / 100) * 100; // Arrondir à 100 près
+
+            // Plages
+            const minPrice = Math.round(estimatedPrice * 0.95 / 100) * 100;
+            const maxPrice = Math.round(estimatedPrice * 1.1 / 100) * 100;
+
+            // Affichage
+            document.getElementById('estimatedPrice').textContent = '€' + estimatedPrice.toLocaleString('fr-FR');
+            document.getElementById('minPrice').textContent = '€' + minPrice.toLocaleString('fr-FR');
+            document.getElementById('optimalPrice').textContent = '€' + estimatedPrice.toLocaleString('fr-FR');
+            document.getElementById('maxPrice').textContent = '€' + maxPrice.toLocaleString('fr-FR');
+            document.getElementById('priceRange').textContent = `Plage estimée: €${minPrice.toLocaleString('fr-FR')} - €${maxPrice.toLocaleString('fr-FR')}`;
+
+            // Conseils
+            let advice = '';
+            if (ctStatus === 'expired' || ctStatus === 'none') {
+                advice += '<div class="advice alert">⚠️ Faites un contrôle technique avant de vendre pour augmenter la confiance des acheteurs</div>';
+            }
+            if (mileage > 150000) {
+                advice += '<div class="advice warning">💡 Kilométrage élevé: privilégiez un prix compétitif</div>';
+            }
+            if (condition < 3) {
+                advice += '<div class="advice warning">💡 État général faible: envisagez des réparations avant vente</div>';
+            }
+            if (totalCosts > 0) {
+                advice += '<div class="advice">✅ Frais réalisés: mettez-les en avant dans l\'annonce (augmente la valeur perçue)</div>';
+            }
+
+            document.getElementById('adviceContainer').innerHTML = advice || '<div class="advice">✅ Annonce prête à être publiée!</div>';
+            document.getElementById('resultBox').classList.add('show');
+        }
+
+        document.getElementById('estimatorForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            calculatePrice();
+        });
+    </script>
+</body>
+</html>
