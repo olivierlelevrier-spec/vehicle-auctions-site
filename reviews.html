@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avis & Évaluations - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; }
+        .btn:hover { background: #2563eb; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .review-form { background: rgba(30, 41, 59, 0.8); border: 2px solid #f59e0b; border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; background: white; color: #1e293b; font-size: 1rem; }
+        textarea { resize: vertical; min-height: 100px; }
+        .stars { display: flex; gap: 10px; font-size: 2rem; margin: 10px 0; }
+        .star { cursor: pointer; color: #94a3b8; transition: color 0.2s; }
+        .star.active { color: #fbbf24; }
+        .star:hover, .star.hover { color: #fbbf24; }
+        .review-item { background: rgba(30, 41, 59, 0.8); border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #f59e0b; }
+        .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .review-author { font-weight: 600; }
+        .review-rating { color: #fbbf24; }
+        .review-date { color: #94a3b8; font-size: 0.9rem; }
+        .review-text { color: #e2e8f0; line-height: 1.6; }
+        .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⭐ Avis & Évaluations</h1>
+        <a href="browse.html" class="btn">← Retour</a>
+    </div>
+    <div class="container">
+        <div class="review-form">
+            <h2 style="margin-bottom: 20px;">Laisser un avis</h2>
+            <div class="form-group">
+                <label>Vendeur</label>
+                <input type="text" id="vendorName" placeholder="Nom du vendeur" />
+            </div>
+            <div class="form-group">
+                <label>Évaluation</label>
+                <div class="stars" id="stars">
+                    <span class="star" onclick="setRating(1)">★</span>
+                    <span class="star" onclick="setRating(2)">★</span>
+                    <span class="star" onclick="setRating(3)">★</span>
+                    <span class="star" onclick="setRating(4)">★</span>
+                    <span class="star" onclick="setRating(5)">★</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Commentaire</label>
+                <textarea id="comment" placeholder="Votre avis..."></textarea>
+            </div>
+            <button class="btn" onclick="submitReview()" style="background: #f59e0b; width: 100%;">Publier l'avis</button>
+        </div>
+        <div id="reviewsList"></div>
+        <div id="empty" class="empty" style="display:none"><p>Aucun avis pour le moment</p></div>
+    </div>
+    <script>
+        let selectedRating = 0;
+        function setRating(rating) { selectedRating = rating; document.querySelectorAll('.star').forEach((s, i) => { s.classList.toggle('active', i < rating); }); }
+        function submitReview() {
+            const vendor = document.getElementById('vendorName').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+            if (!vendor || !selectedRating || !comment) { alert('Remplissez tous les champs'); return; }
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const reviewsKey = 'reviews_' + vendor;
+            const reviews = JSON.parse(localStorage.getItem(reviewsKey) || '[]');
+            reviews.push({ author: currentUser.name, rating: selectedRating, comment, date: new Date().toISOString() });
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+            document.getElementById('vendorName').value = '';
+            document.getElementById('comment').value = '';
+            selectedRating = 0;
+            document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+            loadReviews();
+        }
+        function loadReviews() {
+            const reviews = JSON.parse(localStorage.getItem('reviews_Auto Experts France') || '[]');
+            if (reviews.length === 0) { document.getElementById('empty').style.display = 'block'; document.getElementById('reviewsList').innerHTML = ''; return; }
+            document.getElementById('empty').style.display = 'none';
+            const html = reviews.map(r => `<div class="review-item"><div class="review-header"><div><div class="review-author">${r.author}</div><div class="review-date">${new Date(r.date).toLocaleDateString('fr-FR')}</div></div><div class="review-rating">${'★'.repeat(r.rating)}</div></div><div class="review-text">${r.comment}</div></div>`).join('');
+            document.getElementById('reviewsList').innerHTML = html;
+        }
+        loadReviews();
+    </script>
+</body>
+</html>
