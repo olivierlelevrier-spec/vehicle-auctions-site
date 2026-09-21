@@ -193,6 +193,20 @@
             document.getElementById('mileage').textContent = listing.mileage;
             document.getElementById('description').textContent = listing.description;
             checkFavorite(listing.id);
+            // Display composite photo if available
+            const photoEl = document.getElementById('emoji');
+            if (listing.photo) {
+                photoEl.style.backgroundImage = `url('${listing.photo}')`;
+                photoEl.textContent = '';
+            } else if (listing.id === 1 && typeof AUDI_A1_PHOTO !== 'undefined') {
+                photoEl.style.backgroundImage = `url('${AUDI_A1_PHOTO}')`;
+                photoEl.textContent = '';
+            } else if (listing.id === 2 && typeof AIXAM_S9_PHOTO !== 'undefined') {
+                photoEl.style.backgroundImage = `url('${AIXAM_S9_PHOTO}')`;
+                photoEl.textContent = '';
+            } else {
+                photoEl.textContent = listing.emoji;
+            }
         }
 
         function placeBid() {
