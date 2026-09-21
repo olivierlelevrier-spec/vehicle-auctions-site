@@ -68,6 +68,9 @@
             justify-content: center;
             font-size: 3rem;
             margin-bottom: 15px;
+            object-fit: cover;
+            background-size: cover;
+            background-position: center;
         }
         .listing-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
         .listing-year { color: #94a3b8; font-size: 0.9rem; margin-bottom: 12px; }
@@ -75,55 +78,61 @@
         .listing-status { background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; color: #86efac; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 15px; display: inline-block; }
         .bid-btn { width: 100%; padding: 12px; background: #8b5cf6; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
         .bid-btn:hover { background: #7c3aed; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state h2 { color: #94a3b8; margin-bottom: 20px; }
+        .empty-state p { color: #64748b; margin-bottom: 30px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🚗 Parcourir les enchères</h1>
+        <h1>🚗 Parcourir les encheres</h1>
         <div class="user-info">
             <span id="userName">Utilisateur</span>
-            <button class="logout-btn" onclick="window.location.href='messages.html'" style="background: #6366f1;">💬 Messages</button>
-            <button class="logout-btn" onclick="window.location.href='notifications.html'" style="background: #ef4444;">🔔 Notifications <span id="notifCount" style="display:none; background: #fbbf24; color: #1e293b; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px;">0</span></button>
-            <button class="logout-btn" onclick="window.location.href='favorites.html'" style="background: #8b5cf6;">❤️ Favoris</button>
-            <button class="logout-btn" onclick="window.location.href='my-listings.html'" style="background: #f59e0b;">📋 Mes Annonces</button>
-            <button class="logout-btn" onclick="logout()">Déconnexion</button>
+            <button class="logout-btn" onclick="window.location.href='messages.html'" style="background: #6366f1;">Messages</button>
+            <button class="logout-btn" onclick="window.location.href='notifications.html'" style="background: #ef4444;">Notifications</button>
+            <button class="logout-btn" onclick="window.location.href='favorites.html'" style="background: #8b5cf6;">Favoris</button>
+            <button class="logout-btn" onclick="window.location.href='my-listings.html'" style="background: #f59e0b;">Mes Annonces</button>
+            <button class="logout-btn" onclick="logout()">Deconnexion</button>
         </div>
     </div>
 
     <div class="listings" id="listingsContainer"></div>
+    <div id="emptyState" style="display:none;"></div>
 
+    <script src="listings-data.js"></script>
     <script>
-        const SAMPLE_LISTINGS = [
-            { id: 1, title: 'BMW M3 2018', year: 2018, price: 45000, emoji: '🏎️' },
-            { id: 2, title: 'Mercedes C63 2020', year: 2020, price: 62000, emoji: '⚡' },
-            { id: 3, title: 'Audi RS6 2019', year: 2019, price: 55000, emoji: '🔥' },
-            { id: 4, title: 'Porsche 911 2017', year: 2017, price: 78000, emoji: '💎' },
-            { id: 5, title: 'Tesla Model S 2021', year: 2021, price: 52000, emoji: '⚙️' },
-            { id: 6, title: 'Range Rover 2019', year: 2019, price: 48000, emoji: '👑' }
-        ];
-
         function init() {
             const currentUserStr = localStorage.getItem('currentUser');
             const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
             if (!currentUser || !currentUser.name) window.location.href = 'index.html';
             else { document.getElementById('userName').textContent = currentUser.name; displayListings(); updateNotificationBadge(currentUser); }
         }
+
         function updateNotificationBadge(user) {
             const notifKey = 'notifications_' + user.email;
             const notifications = JSON.parse(localStorage.getItem(notifKey) || '[]');
             const count = notifications.length;
-            if (count > 0) { document.getElementById('notifCount').style.display = 'inline-flex'; document.getElementById('notifCount').textContent = count; }
+            if (count > 0) { document.getElementById('notifCount').display = 'inline-block'; document.getElementById('notifCount').textContent = count; }
         }
 
         function displayListings() {
             const container = document.getElementById('listingsContainer');
-            container.innerHTML = SAMPLE_LISTINGS.map(l => {
+            
+            if (!REAL_LISTINGS || REAL_LISTINGS.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('emptyState').innerHTML = '<div class="empty-state"><h2>Aucune annonce</h2></div>';
+                return;
+            }
+
+            container.innerHTML = REAL_LISTINGS.map(l => {
+                const firstPhoto = l.photos && l.photos.length > 0 ? l.photos[0] : '';
+                const bgStyle = firstPhoto ? `background-image: url('${firstPhoto}');` : '';
                 return '<div class="listing-card" onclick="viewListing(' + l.id + ')">' +
-                    '<div class="listing-image">' + l.emoji + '</div>' +
+                    '<div class="listing-image" style="' + bgStyle + '">' + (bgStyle ? '' : (l.emoji || '')) + '</div>' +
                     '<div class="listing-title">' + l.title + '</div>' +
-                    '<div class="listing-year">Année: ' + l.year + '</div>' +
-                    '<div class="listing-price">€' + l.price.toLocaleString('fr-FR') + '</div>' +
-                    '<div class="listing-status">Enchère active</div>' +
+                    '<div class="listing-year">Annee: ' + l.year + ' | ' + (l.mileage ? l.mileage.toLocaleString('fr-FR') + ' km' : '') + '</div>' +
+                    '<div class="listing-price">EUR' + l.price.toLocaleString('fr-FR') + '</div>' +
+                    '<div class="listing-status">Enchere active</div>' +
                     '<button class="bid-btn" onclick="event.stopPropagation(); placeBid(' + l.id + ')">Faire une offre</button>' +
                     '</div>';
             }).join('');
@@ -135,18 +144,8 @@
 
         function placeBid(id) {
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const listing = SAMPLE_LISTINGS.find(l => l.id === id);
-            const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
-
-            if (!newBid) return;
-            const bidAmount = parseInt(newBid);
-
-            if (bidAmount <= listing.price) {
-                alert('Votre offre doit être plus haute que le prix actuel');
-                return;
-            }
-
-            alert('Offre de €' + bidAmount + ' placée pour ' + listing.title + '!\n\nAu meilleur compte pour: ' + currentUser.name);
+            const listing = REAL_LISTINGS.find(l => l.id === id);
+            alert('Offre placee pour ' + listing.title);
         }
 
         function logout() {
