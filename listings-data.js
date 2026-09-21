@@ -1,3 +1,4 @@
+// Real vehicle listings with photos
 const REAL_LISTINGS = [
     {
         id: 1,
@@ -6,29 +7,17 @@ const REAL_LISTINGS = [
         price: 18500,
         mileage: 95000,
         emoji: '🔴',
-        brand: 'Audi',
-        model: 'A1',
-        transmission: 'Automatique',
-        fuel: 'Essence',
-        description: 'Audi A1 TFSI 110cv avec 95 000 km. Excellent etat. Premiere main. Vendeur LLC Auto.',
-        photos: [],
-        createdBy: 'Vendeur LLC Auto',
-        status: 'active'
+        photos: typeof AUDI_A1_PHOTO !== 'undefined' ? [AUDI_A1_PHOTO] : [],
+        description: 'Audi A1 TFSI 110cv avec 95 000 km. Excellent etat. Premiere main. Vendeur LLC Auto.'
     },
     {
         id: 2,
-        title: 'Geely - Sans Permis',
+        title: 'Aixam S9 - Sans Permis',
         year: 2022,
         price: 9990,
         mileage: 12000,
-        emoji: '💙',
-        brand: 'Geely',
-        model: 'Sans Permis',
-        transmission: 'Automatique',
-        fuel: 'Essence',
-        description: 'Geely sans permis - 12 000 km. Etat neuf. Interieur impeccable. Plaque GH-101-JS. Region Aube.',
-        photos: [],
-        createdBy: 'L AGENCY',
-        status: 'active'
+        emoji: '🚙',
+        photos: typeof AIXAM_S9_PHOTO !== 'undefined' ? [AIXAM_S9_PHOTO] : [],
+        description: 'Aixam S9 sans permis - 12 000 km. Etat neuf. Interieur impeccable. Plaque GH-101-JS.'
     }
 ];
