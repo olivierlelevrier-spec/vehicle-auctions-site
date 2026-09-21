@@ -156,40 +156,34 @@
         </div>
     </div>
 
+
     <script>
-        const SAMPLE_LISTINGS = [
-            { id: 1, title: 'BMW M3 2018', year: 2018, price: 45000, emoji: '🏎️', mileage: '45,000 km', description: 'BMW M3 2018 en excellent état. Révisions à jour, historique complet. Intérieur cuir, toit panoramique. Parfait pour les amateurs de performance.' },
-            { id: 2, title: 'Mercedes C63 2020', year: 2020, price: 62000, emoji: '⚡', mileage: '28,000 km', description: 'Mercedes-AMG C63 2020 avec tous les équipements. Performance exceptionnelle. Entretien concessionnaire. Garantie restante.' },
-            { id: 3, title: 'Audi RS6 2019', year: 2019, price: 55000, emoji: '🔥', mileage: '35,000 km', description: 'Audi RS6 Avant 2019. Moteur V10 twin-turbo. Très rare. État concours. Tous les services à jour.' },
-            { id: 4, title: 'Porsche 911 2017', year: 2017, price: 78000, emoji: '💎', mileage: '22,000 km', description: 'Porsche 911 Carrera 2017. Classique moderne. Impeccable. Historique complet. Investment piece.' },
-            { id: 5, title: 'Tesla Model S 2021', year: 2021, price: 52000, emoji: '⚙️', mileage: '15,000 km', description: 'Tesla Model S 2021. Électrique haute performance. Batterie longue autonomie. Pilote automatique. État neuf.' },
-            { id: 6, title: 'Range Rover 2019', year: 2019, price: 48000, emoji: '👑', mileage: '38,000 km', description: 'Range Rover 2019. Prestige et confort. Tout équipé. Révisions complètes. Parfait état.' }
+        const REAL_LISTINGS = [
+            { id: 1, title: 'Audi A1 TFSI 110cv - Automatique', year: 2020, price: 18500, mileage: 95000, emoji: '🔴', description: 'Audi A1 TFSI 110cv avec 95 000 km. Excellent etat. Premiere main.' },
+            { id: 2, title: 'Geely - Sans Permis', year: 2022, price: 9990, mileage: 12000, emoji: '💙', description: 'Geely sans permis - 12 000 km. Etat neuf. Interieur impeccable.' }
         ];
 
         function init() {
             const params = new URLSearchParams(window.location.search);
             const id = parseInt(params.get('id'));
-
-            const listing = SAMPLE_LISTINGS.find(l => l.id === id);
+            const listing = REAL_LISTINGS.find(l => l.id === id);
             if (!listing) {
                 window.location.href = 'browse.html';
                 return;
             }
-
             document.getElementById('emoji').textContent = listing.emoji;
             document.getElementById('title').textContent = listing.title;
             document.getElementById('price').textContent = listing.price.toLocaleString('fr-FR');
             document.getElementById('year').textContent = listing.year;
             document.getElementById('mileage').textContent = listing.mileage;
             document.getElementById('description').textContent = listing.description;
-
             checkFavorite(listing.id);
         }
 
         function placeBid() {
             const params = new URLSearchParams(window.location.search);
             const id = parseInt(params.get('id'));
-            const listing = SAMPLE_LISTINGS.find(l => l.id === id);
+            const listing = REAL_LISTINGS.find(l => l.id === id);
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
             if (!newBid) return;
@@ -205,20 +199,15 @@
         function toggleFavorite() {
             const params = new URLSearchParams(window.location.search);
             const id = parseInt(params.get('id'));
-
             let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
             const index = favorites.indexOf(id);
-
             if (index > -1) {
                 favorites.splice(index, 1);
                 document.getElementById('favoriteBtn').textContent = '❤️ Ajouter aux favoris';
-                document.getElementById('favoriteBtn').classList.remove('added');
             } else {
                 favorites.push(id);
                 document.getElementById('favoriteBtn').textContent = '❤️ Retiré des favoris';
-                document.getElementById('favoriteBtn').classList.add('added');
             }
-
             localStorage.setItem('favorites', JSON.stringify(favorites));
         }
 
@@ -226,12 +215,7 @@
             const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
             if (favorites.includes(id)) {
                 document.getElementById('favoriteBtn').textContent = '❤️ Retiré des favoris';
-                document.getElementById('favoriteBtn').classList.add('added');
             }
-        }
-
-        function goBack() {
-            window.location.href = 'browse.html';
         }
 
         init();
