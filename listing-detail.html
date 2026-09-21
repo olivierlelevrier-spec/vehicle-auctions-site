@@ -157,14 +157,17 @@
     </div>
 
 
+    <script src="photo-data.js"></script>
     <script>
         function goBack() {
             window.location.href = 'browse.html';
         }
 
         const REAL_LISTINGS = [
-            { id: 1, title: 'Audi A1 TFSI 110cv - Automatique', year: 2020, price: 18500, mileage: 95000, emoji: '🔴', description: 'Audi A1 TFSI 110cv avec 95 000 km. Excellent etat. Premiere main.' },
-            { id: 2, title: 'Geely - Sans Permis', year: 2022, price: 9990, mileage: 12000, emoji: '💙', description: 'Geely sans permis - 12 000 km. Etat neuf. Interieur impeccable.' }
+            { id: 1, title: 'Audi A1 TFSI 110cv - Automatique',
+                photo: typeof AUDI_A1_PHOTO !== 'undefined' ? AUDI_A1_PHOTO : null, year: 2020, price: 18500, mileage: 95000, emoji: '🔴', description: 'Audi A1 TFSI 110cv avec 95 000 km. Excellent etat. Premiere main.' },
+            { id: 2, title: 'Aixam S9 - Sans Permis', year: 2022, price: 9990, mileage: 12000, emoji: '🚙',
+                photo: typeof AIXAM_S9_PHOTO !== 'undefined' ? AIXAM_S9_PHOTO : null, description: 'Aixam S9 sans permis - 12 000 km. Etat neuf. Interieur impeccable.' }
         ];
 
         function init() {
@@ -175,7 +178,15 @@
                 window.location.href = 'browse.html';
                 return;
             }
-            document.getElementById('emoji').textContent = listing.emoji;
+            const emojiEl = document.getElementById('emoji');
+            if (listing.photo) {
+                emojiEl.style.backgroundImage = `url('${listing.photo}')`;
+                emojiEl.style.backgroundSize = 'cover';
+                emojiEl.style.backgroundPosition = 'center';
+                emojiEl.textContent = '';
+            } else {
+                emojiEl.textContent = listing.emoji;
+            }
             document.getElementById('title').textContent = listing.title;
             document.getElementById('price').textContent = listing.price.toLocaleString('fr-FR');
             document.getElementById('year').textContent = listing.year;
