@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Vendeur - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; }
+        .btn:hover { background: #2563eb; }
+        .step { background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 30px; margin-bottom: 25px; border-left: 5px solid #22c55e; }
+        .step-number { display: inline-block; background: #22c55e; color: #1e293b; width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; font-weight: 700; font-size: 1.2rem; margin-bottom: 15px; }
+        .step-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 15px; }
+        .step-content { color: #cbd5e1; line-height: 1.8; }
+        .step-list { margin-top: 15px; }
+        .step-list li { margin-left: 20px; margin-top: 10px; }
+        .tip { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px; margin-top: 15px; color: #93c5fd; }
+        .warning { background: rgba(245, 158, 11, 0.1); border-left-color: #f59e0b; color: #fcd34d; }
+        .tool-box { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .tool { background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; border-radius: 8px; padding: 15px; text-align: center; }
+        .tool-icon { font-size: 2rem; margin-bottom: 10px; }
+        .tool-name { font-weight: 600; }
+        .link { text-align: center; margin-top: 40px; }
+        .link a { color: #60a5fa; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Guide du Vendeur</h1>
+            <a href="browse.html" class="btn">← Retour</a>
+        </div>
+
+        <!-- ÉTAPE 1 -->
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">Scanner l'immatriculation</div>
+            <div class="step-content">
+                Commencez par scanner le numéro d'immatriculation de votre véhicule pour identifier automatiquement la marque et le modèle.
+                <ul class="step-list">
+                    <li>Utilisez le scanner d'immatriculation</li>
+                    <li>Entrez le format: AA-123-BC</li>
+                    <li>Vérifiez les données extraites</li>
+                </ul>
+                <div class="tip">💡 Conseil: Prenez une photo claire de la plaque d'immatriculation pour un scan plus rapide</div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2 -->
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">Analyser les photos</div>
+            <div class="step-content">
+                Les photos de qualité sont essentielles! Analysez vos photos avant de les publier.
+                <ul class="step-list">
+                    <li>Minimum 1200x800px de résolution</li>
+                    <li>5 photos pour une meilleure visibilité</li>
+                    <li>Lumière naturelle (pas de flash direct)</li>
+                    <li>Montrez les défauts (confiance acheteur)</li>
+                </ul>
+                <div class="tip">💡 Conseil: Les annonces avec 5 photos reçoivent 2x plus de vues!</div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 -->
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">Estimer le prix</div>
+            <div class="step-content">
+                Utilisez l'estimateur de prix automatique pour fixer un tarif compétitif.
+                <ul class="step-list">
+                    <li>Entrez année, kilométrage, état CT</li>
+                    <li>Calculez automatiquement le prix de marché</li>
+                    <li>Ajustez selon vos frais réalisés</li>
+                    <li>Comparez avec les annonces similaires</li>
+                </ul>
+                <div class="warning tip">⚠️ Important: Un prix 5% en-dessous du marché reçoit 60% plus d'enchères!</div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4 -->
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-title">Remplir l'annonce complète</div>
+            <div class="step-content">
+                Créez une annonce détaillée avec tous les informations importantes.
+                <ul class="step-list">
+                    <li>✅ Contrôle technique (date, anomalies)</li>
+                    <li>✅ Frais réalisés (révisions, pneus, etc.)</li>
+                    <li>✅ Frais prévus à votre charge</li>
+                    <li>✅ État général (intérieur, extérieur, moteur)</li>
+                </ul>
+                <div class="tip">💡 Conseil: Les annonces transparentes gagnent la confiance et reçoivent des offres plus élevées</div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 5 -->
+        <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-title">Publier et promouvoir</div>
+            <div class="step-content">
+                Lancez votre annonce et suivez sa performance.
+                <ul class="step-list">
+                    <li>Publiez jeudi ou vendredi pour plus de vues</li>
+                    <li>Répondez rapidement aux enchères</li>
+                    <li>Utilisez le dashboard pour suivre les stats</li>
+                    <li>Boostez si nécessaire (bientôt)</li>
+                </ul>
+                <div class="tip">💡 Conseil: Temps moyen de vente: 3-7 jours. Avec 4+ photos: 2-3 jours!</div>
+            </div>
+        </div>
+
+        <!-- OUTILS DISPONIBLES -->
+        <div style="margin-top: 40px;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 20px;">🛠️ Outils Disponibles</h2>
+            <div class="tool-box">
+                <div class="tool">
+                    <div class="tool-icon">📋</div>
+                    <div class="tool-name">Scanner Immatriculation</div>
+                </div>
+                <div class="tool">
+                    <div class="tool-icon">📸</div>
+                    <div class="tool-name">Analyseur de Photos</div>
+                </div>
+                <div class="tool">
+                    <div class="tool-icon">💰</div>
+                    <div class="tool-name">Estimateur de Prix</div>
+                </div>
+                <div class="tool">
+                    <div class="tool-icon">📊</div>
+                    <div class="tool-name">Dashboard Vendeur</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BONNES PRATIQUES -->
+        <div class="step" style="border-left-color: #f59e0b; background: rgba(245, 158, 11, 0.1); margin-top: 40px;">
+            <div class="step-title" style="color: #fcd34d;">✅ Checklist Avant Publication</div>
+            <ul class="step-list" style="color: #fef3c7;">
+                <li>☑️ Photos analysées (score 80+)</li>
+                <li>☑️ Prix estimé et compétitif</li>
+                <li>☑️ Contrôle technique à jour ou signalé</li>
+                <li>☑️ Frais détaillés et justifiés</li>
+                <li>☑️ Description complète et honnête</li>
+                <li>☑️ État général vérifié</li>
+                <li>☑️ Tous les champs remplis</li>
+            </ul>
+        </div>
+
+        <div class="link">
+            <a href="create-listing.html">→ Créer ma première annonce</a>
+        </div>
+    </div>
+</body>
+</html>
