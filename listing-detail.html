@@ -190,16 +190,15 @@
             const params = new URLSearchParams(window.location.search);
             const id = parseInt(params.get('id'));
             const listing = SAMPLE_LISTINGS.find(l => l.id === id);
-
-            window.location.href = 'bid.html?id=' + id; return; const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
             if (!newBid) return;
-
             const bidAmount = parseInt(newBid);
-            if (bidAmount <= listing.price) {
-                alert('Votre offre doit être plus haute que le prix actuel');
-                return;
-            }
-
+            if (bidAmount <= listing.price) { alert('Votre offre doit être plus haute que le prix actuel'); return; }
+            const notifKey = 'notifications_' + currentUser.email;
+            const notifications = JSON.parse(localStorage.getItem(notifKey) || '[]');
+            notifications.push({ type: 'success', title: '✅ Offre placée', message: 'Votre offre de €' + bidAmount.toLocaleString('fr-FR') + ' pour ' + listing.title + ' a été enregistrée.', time: new Date().toISOString() });
+            localStorage.setItem(notifKey, JSON.stringify(notifications));
             alert('✅ Offre de €' + bidAmount + ' placée!\n\nLe vendeur vous contactera sous peu.');
         }
 

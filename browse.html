@@ -82,6 +82,7 @@
         <h1>🚗 Parcourir les enchères</h1>
         <div class="user-info">
             <span id="userName">Utilisateur</span>
+            <button class="logout-btn" onclick="window.location.href='notifications.html'" style="background: #ef4444;">🔔 Notifications <span id="notifCount" style="display:none; background: #fbbf24; color: #1e293b; border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; display: inline-flex; align-items: center; justify-content: center; margin-left: 5px;">0</span></button>
             <button class="logout-btn" onclick="window.location.href='favorites.html'" style="background: #8b5cf6;">❤️ Favoris</button>
             <button class="logout-btn" onclick="window.location.href='my-listings.html'" style="background: #f59e0b;">📋 Mes Annonces</button>
             <button class="logout-btn" onclick="logout()">Déconnexion</button>
@@ -104,7 +105,13 @@
             const currentUserStr = localStorage.getItem('currentUser');
             const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
             if (!currentUser || !currentUser.name) window.location.href = 'index.html';
-            else { document.getElementById('userName').textContent = currentUser.name; displayListings(); }
+            else { document.getElementById('userName').textContent = currentUser.name; displayListings(); updateNotificationBadge(currentUser); }
+        }
+        function updateNotificationBadge(user) {
+            const notifKey = 'notifications_' + user.email;
+            const notifications = JSON.parse(localStorage.getItem(notifKey) || '[]');
+            const count = notifications.length;
+            if (count > 0) { document.getElementById('notifCount').style.display = 'inline-flex'; document.getElementById('notifCount').textContent = count; }
         }
 
         function displayListings() {
