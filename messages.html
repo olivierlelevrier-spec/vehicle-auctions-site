@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+        .header { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; }
+        .btn:hover { background: #2563eb; }
+        .sidebar { background: rgba(30, 41, 59, 0.8); border-radius: 8px; padding: 15px; max-height: 600px; overflow-y: auto; }
+        .conversation { padding: 10px; background: rgba(59, 130, 246, 0.2); border-radius: 6px; margin-bottom: 10px; cursor: pointer; border: 2px solid transparent; }
+        .conversation:hover { border-color: #3b82f6; }
+        .conversation.active { background: rgba(59, 130, 246, 0.4); border-color: #3b82f6; }
+        .conv-name { font-weight: 600; font-size: 0.9rem; }
+        .conv-preview { color: #94a3b8; font-size: 0.85rem; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-area { background: rgba(30, 41, 59, 0.8); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; }
+        .messages { flex: 1; overflow-y: auto; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 400px; }
+        .message { padding: 10px 15px; border-radius: 8px; max-width: 80%; word-wrap: break-word; }
+        .message.sent { align-self: flex-end; background: #3b82f6; }
+        .message.received { align-self: flex-start; background: rgba(71, 85, 105, 0.5); }
+        .input-area { display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border: 2px solid #3b82f6; border-radius: 6px; background: white; color: #1e293b; }
+        button { padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .empty { text-align: center; color: #94a3b8; padding: 40px 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Messages</h1>
+            <a href="browse.html" class="btn">← Retour</a>
+        </div>
+        <div class="sidebar">
+            <div id="conversations"></div>
+            <div id="noConv" style="text-align: center; color: #94a3b8; padding: 20px;"><p>Aucune conversation</p></div>
+        </div>
+        <div class="chat-area">
+            <div id="chatHeader" style="margin-bottom: 15px; font-size: 1.1rem; font-weight: 600;"></div>
+            <div class="messages" id="messages"></div>
+            <div class="input-area">
+                <input type="text" id="msgInput" placeholder="Votre message..." />
+                <button onclick="sendMessage()">Envoyer</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentConversation = null;
+        function init() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+            loadConversations();
+        }
+        function loadConversations() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const convKey = 'conversations_' + currentUser.email;
+            const conversations = JSON.parse(localStorage.getItem(convKey) || '[]');
+            const convDiv = document.getElementById('conversations');
+            if (conversations.length === 0) { convDiv.innerHTML = ''; document.getElementById('noConv').style.display = 'block'; return; }
+            document.getElementById('noConv').style.display = 'none';
+            convDiv.innerHTML = conversations.map((c, i) => `<div class="conversation ${currentConversation === i ? 'active' : ''}" onclick="selectConversation(${i})"><div class="conv-name">${c.otherUser}</div><div class="conv-preview">${c.messages[c.messages.length - 1]?.text || 'Pas de messages'}</div></div>`).join('');
+        }
+        function selectConversation(index) {
+            currentConversation = index;
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const convKey = 'conversations_' + currentUser.email;
+            const conversations = JSON.parse(localStorage.getItem(convKey) || '[]');
+            const conv = conversations[index];
+            document.getElementById('chatHeader').textContent = '💬 ' + conv.otherUser;
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = conv.messages.map(m => `<div class="message ${m.sent ? 'sent' : 'received'}">${m.text}</div>`).join('');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            loadConversations();
+        }
+        function sendMessage() {
+            if (currentConversation === null) { alert('Sélectionnez une conversation'); return; }
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if (!text) return;
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const convKey = 'conversations_' + currentUser.email;
+            const conversations = JSON.parse(localStorage.getItem(convKey) || '[]');
+            conversations[currentConversation].messages.push({ text, sent: true, time: new Date().toISOString() });
+            localStorage.setItem(convKey, JSON.stringify(conversations));
+            input.value = '';
+            selectConversation(currentConversation);
+        }
+        init();
+    </script>
+</body>
+</html>
