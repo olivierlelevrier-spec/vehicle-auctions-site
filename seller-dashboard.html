@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Vendeur - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #2563eb; }
+        .btn-green { background: #22c55e; }
+        .btn-green:hover { background: #16a34a; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: rgba(30, 41, 59, 0.8); border-radius: 12px; padding: 25px; border-left: 4px solid #3b82f6; }
+        .stat-card.success { border-left-color: #22c55e; }
+        .stat-card.warning { border-left-color: #f59e0b; }
+        .stat-card.alert { border-left-color: #ef4444; }
+        .stat-label { color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 700; }
+        .stat-change { color: #22c55e; font-size: 0.85rem; margin-top: 5px; }
+        .stat-change.negative { color: #ef4444; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid rgba(71, 85, 105, 0.3); }
+        .tab { padding: 12px 20px; background: none; color: #94a3b8; border: none; cursor: pointer; font-size: 1rem; font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+        .content { display: none; }
+        .content.active { display: block; }
+        .listings-table { width: 100%; background: rgba(30, 41, 59, 0.8); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
+        th { background: rgba(59, 130, 246, 0.2); font-weight: 600; }
+        tr:hover { background: rgba(59, 130, 246, 0.1); }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .status-active { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .status-inactive { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; }
+        .status-sold { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .insight-card { background: rgba(30, 41, 59, 0.8); border-radius: 8px; padding: 20px; margin-bottom: 15px; border-left: 4px solid #f59e0b; }
+        .insight-title { font-weight: 600; margin-bottom: 8px; }
+        .insight-text { color: #cbd5e1; font-size: 0.9rem; }
+        .action-btn { padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+        .action-btn:hover { background: #2563eb; }
+        .empty { text-align: center; padding: 40px 20px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Dashboard Vendeur</h1>
+        <div>
+            <a href="create-listing.html" class="btn btn-green">+ Créer Annonce</a>
+            <a href="browse.html" class="btn" style="margin-left: 10px;">← Retour</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- STATISTIQUES -->
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="stat-label">Annonces Actives</div>
+                <div class="stat-value" id="activeListings">0</div>
+                <div class="stat-change">+12% ce mois</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Vues</div>
+                <div class="stat-value" id="totalViews">0</div>
+                <div class="stat-change">↑ 24% vs mois dernier</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-label">Enchères Reçues</div>
+                <div class="stat-value" id="totalBids">0</div>
+                <div class="stat-change">Taux de conversion: 5%</div>
+            </div>
+            <div class="stat-card alert">
+                <div class="stat-label">Revenue Estimée</div>
+                <div class="stat-value" id="totalRevenue">€0</div>
+                <div class="stat-change">Sur annonces vendues</div>
+            </div>
+        </div>
+
+        <!-- ONGLETS -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">Vue d'ensemble</button>
+            <button class="tab" onclick="switchTab('listings')">Mes Annonces</button>
+            <button class="tab" onclick="switchTab('insights')">Insights</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="content active">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="insight-card">
+                    <div class="insight-title">🎯 Recommandation Prix</div>
+                    <div class="insight-text">Utilisez l'estimateur de prix automatique pour fixer un prix compétitif sur le marché. Les annonces bien tarifées reçoivent 3x plus d'enchères.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">📸 Qualité des Photos</div>
+                    <div class="insight-text">Analysez vos photos avant de les publier. Les annonces avec 5 photos de qualité reçoivent 2x plus de vues.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">🔧 Contrôle Technique</div>
+                    <div class="insight-text">Un CT à jour augmente la confiance des acheteurs de 40%. Included it in your listing details.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">⏰ Timing Optimal</div>
+                    <div class="insight-text">Publiez vos annonces le jeudi ou vendredi pour plus de visibilité. Évitez les périodes de vacances.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MES ANNONCES -->
+        <div id="listings" class="content">
+            <table class="listings-table">
+                <thead>
+                    <tr>
+                        <th>Véhicule</th>
+                        <th>Prix</th>
+                        <th>Vues</th>
+                        <th>Enchères</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="listingsBody">
+                    <tr><td colspan="6" class="empty">Aucune annonce trouvée</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- INSIGHTS -->
+        <div id="insights" class="content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div class="insight-card">
+                    <div class="insight-title">📈 Tendances Marché</div>
+                    <div class="insight-text">Les SUV et voitures électriques dominent les recherches cette semaine. Ajustez votre inventaire en conséquence.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">💡 Meilleur Taux de Conversion</div>
+                    <div class="insight-text">Marques: Tesla (12%), Mercedes (8%), BMW (7%). Les véhicules électriques performent 2x mieux.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">⏱️ Temps Moyen Vente</div>
+                    <div class="insight-text">3-7 jours en moyenne. Les annonces avec 4+ photos se vendent en 2-3 jours.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">🎯 Prix Compétitif</div>
+                    <div class="insight-text">Analysez les annonces similaires. Être dans les 5% les moins chers booste les enchères de 60%.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">⭐ Score Vendeur</div>
+                    <div class="insight-text">Votre score: 4.8/5. Basé sur: photos, CT, prix, rapidité de réponse. Excellente réputation!</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">🚀 Booster Annonce</div>
+                    <div class="insight-text">Mise en avant premium: +180% de vues. Offre limitée: €4.99 pour 7 jours (bientôt disponible).</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function init() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+
+            const myListings = JSON.parse(localStorage.getItem('myListings_' + currentUser.email) || '[]');
+            const activeCount = myListings.filter(l => l.status !== 'sold').length;
+            const totalViews = myListings.reduce((sum, l) => sum + (l.views || 0), 0);
+            const totalBids = myListings.reduce((sum, l) => sum + (l.bids || 0), 0);
+            const totalRevenue = myListings.reduce((sum, l) => sum + (l.sold ? l.price : 0), 0);
+
+            document.getElementById('activeListings').textContent = activeCount;
+            document.getElementById('totalViews').textContent = totalViews;
+            document.getElementById('totalBids').textContent = totalBids;
+            document.getElementById('totalRevenue').textContent = '€' + totalRevenue.toLocaleString('fr-FR');
+
+            // Afficher annonces
+            if (myListings.length === 0) {
+                document.getElementById('listingsBody').innerHTML = '<tr><td colspan="6" class="empty">Aucune annonce trouvée</td></tr>';
+            } else {
+                const html = myListings.map(l => `
+                    <tr>
+                        <td>${l.title}</td>
+                        <td>€${l.price.toLocaleString('fr-FR')}</td>
+                        <td>${l.views || 0}</td>
+                        <td>${l.bids || 0}</td>
+                        <td><span class="status-badge status-active">Actif</span></td>
+                        <td><button class="action-btn" onclick="editListing(${l.id})">Éditer</button></td>
+                    </tr>
+                `).join('');
+                document.getElementById('listingsBody').innerHTML = html;
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function editListing(id) { alert('Édition disponible prochainement'); }
+
+        init();
+    </script>
+</body>
+</html>
