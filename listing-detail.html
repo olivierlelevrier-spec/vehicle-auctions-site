@@ -6,99 +6,37 @@
     <title>Détail Annonce - VehicleAuctions</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .header {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .back-btn { padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
         .back-btn:hover { background: #2563eb; }
         .container { max-width: 1000px; margin: 0 auto; }
-        .detail-card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(71, 85, 105, 0.3);
-            border-radius: 12px;
-            padding: 30px;
-        }
-        .image-section {
-            width: 100%;
-            height: 300px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-            margin-bottom: 30px;
-        }
+        .detail-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 30px; }
+
+        /* Gallery Section */
+        .gallery-section { margin-bottom: 30px; }
+        .main-image { width: 100%; height: 400px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 5rem; margin-bottom: 20px; object-fit: cover; background-size: cover; background-position: center; }
+        .thumbnails { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .thumbnail { width: 100%; height: 100px; background: rgba(30, 41, 59, 0.5); border: 2px solid rgba(71, 85, 105, 0.3); border-radius: 6px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; font-size: 2rem; background-size: cover; background-position: center; }
+        .thumbnail:hover { border-color: #3b82f6; transform: scale(1.05); }
+        .thumbnail.active { border-color: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+
         .title-section { margin-bottom: 20px; }
         .title-section h1 { font-size: 2rem; margin-bottom: 10px; }
         .price { font-size: 2rem; color: #22c55e; font-weight: 700; }
-        .specs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(71, 85, 105, 0.1);
-            border-radius: 8px;
-        }
+        .specs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 30px 0; padding: 20px; background: rgba(71, 85, 105, 0.1); border-radius: 8px; }
         .spec { padding: 10px 0; border-bottom: 1px solid rgba(71, 85, 105, 0.3); }
         .spec:last-child { border-bottom: none; }
         .spec-label { color: #94a3b8; font-size: 0.9rem; }
         .spec-value { font-size: 1.2rem; font-weight: 600; }
-        .description {
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(71, 85, 105, 0.1);
-            border-left: 4px solid #8b5cf6;
-            border-radius: 4px;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .bid-btn {
-            flex: 1;
-            padding: 15px;
-            background: #8b5cf6;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+        .description { margin: 30px 0; padding: 20px; background: rgba(71, 85, 105, 0.1); border-left: 4px solid #8b5cf6; border-radius: 4px; }
+        .action-buttons { display: flex; gap: 15px; margin-top: 30px; }
+        .bid-btn { flex: 1; padding: 15px; background: #8b5cf6; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 1rem; cursor: pointer; }
         .bid-btn:hover { background: #7c3aed; }
-        .favorite-btn {
-            padding: 15px 25px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-        }
+        .favorite-btn { padding: 15px 25px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 1rem; cursor: pointer; }
         .favorite-btn:hover { background: #dc2626; }
         .favorite-btn.added { background: #10b981; }
-        .contact-info {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(71, 85, 105, 0.1);
-            border-radius: 8px;
-        }
+        .contact-info { margin-top: 30px; padding: 20px; background: rgba(71, 85, 105, 0.1); border-radius: 8px; }
         .contact-info h3 { margin-bottom: 15px; }
         .contact-info p { margin: 5px 0; }
     </style>
@@ -110,7 +48,11 @@
 
     <div class="container">
         <div class="detail-card">
-            <div class="image-section" id="emoji"></div>
+            <!-- GALLERY SECTION -->
+            <div class="gallery-section">
+                <div class="main-image" id="mainImage"></div>
+                <div class="thumbnails" id="thumbnails"></div>
+            </div>
 
             <div class="title-section">
                 <h1 id="title"></h1>
@@ -159,57 +101,70 @@
     <script src="photo-data.js"></script>
     <script src="listings-data.js"></script>
     <script>
-        // Add Aixam S9 listing if photo-data.js loaded successfully
-        if (typeof AIXAM_S9_PHOTO !== 'undefined') {
-            REAL_LISTINGS.push({
-                id: 2,
-                title: 'Aixam S9 - Sans Permis',
-                year: 2022,
-                price: 9990,
-                mileage: 12000,
-                emoji: '🚙',
-                brand: 'Aixam',
-                model: 'S9',
-                transmission: 'Manuelle',
-                fuel: 'Essence',
-                description: 'Aixam S9 sans permis - 12 000 km. Etat neuf. Interieur impeccable. Plaque GH-101-JS.',
-                photos: [AIXAM_S9_PHOTO]
-            });
-        }
+        let currentPhotoIndex = 0;
+        let listing = null;
 
         function init() {
             const params = new URLSearchParams(window.location.search);
             const id = parseInt(params.get('id'));
 
-            const listing = REAL_LISTINGS.find(l => l.id === id);
+            listing = REAL_LISTINGS.find(l => l.id === id);
             if (!listing) {
                 window.location.href = 'browse.html';
                 return;
             }
 
-            const emojiEl = document.getElementById('emoji');
-            const firstPhoto = listing.photos && listing.photos.length > 0 ? listing.photos[0] : null;
-            if (firstPhoto && firstPhoto.startsWith('data:')) {
-                emojiEl.style.backgroundImage = `url('${firstPhoto}')`;
-                emojiEl.style.backgroundSize = 'cover';
-                emojiEl.style.backgroundPosition = 'center';
-                emojiEl.textContent = '';
-            } else {
-                emojiEl.textContent = listing.emoji;
-            }
             document.getElementById('title').textContent = listing.title;
             document.getElementById('price').textContent = listing.price.toLocaleString('fr-FR');
             document.getElementById('year').textContent = listing.year;
             document.getElementById('mileage').textContent = listing.mileage ? listing.mileage.toLocaleString('fr-FR') + ' km' : 'N/A';
             document.getElementById('description').textContent = listing.description;
 
+            setupGallery();
             checkFavorite(listing.id);
         }
 
+        function setupGallery() {
+            const photos = listing.photos && listing.photos.length > 0 ? listing.photos : [listing.emoji];
+
+            updateMainImage(0);
+
+            const thumbContainer = document.getElementById('thumbnails');
+            thumbContainer.innerHTML = photos.map((photo, idx) => {
+                const bgStyle = photo.startsWith('data:') ? 'background-image: url(' + JSON.stringify(photo) + ');' : '';
+                return '<div class="thumbnail ' + (idx === 0 ? 'active' : '') + '" onclick="selectPhoto(' + idx + ')" style="' + bgStyle + '">' + (!bgStyle ? '📷' : '') + '</div>';
+            }).join('');
+        }
+
+        function selectPhoto(idx) {
+            const photos = listing.photos && listing.photos.length > 0 ? listing.photos : [listing.emoji];
+            if (idx < 0 || idx >= photos.length) return;
+
+            currentPhotoIndex = idx;
+            updateMainImage(idx);
+
+            document.querySelectorAll('.thumbnail').forEach((el, i) => {
+                el.classList.toggle('active', i === idx);
+            });
+        }
+
+        function updateMainImage(idx) {
+            const photos = listing.photos && listing.photos.length > 0 ? listing.photos : [listing.emoji];
+            const photo = photos[idx];
+            const mainEl = document.getElementById('mainImage');
+
+            if (photo.startsWith('data:')) {
+                mainEl.style.backgroundImage = 'url(' + JSON.stringify(photo) + ')';
+                mainEl.style.backgroundSize = 'cover';
+                mainEl.style.backgroundPosition = 'center';
+                mainEl.textContent = '';
+            } else {
+                mainEl.style.backgroundImage = 'none';
+                mainEl.textContent = photo;
+            }
+        }
+
         function placeBid() {
-            const params = new URLSearchParams(window.location.search);
-            const id = parseInt(params.get('id'));
-            const listing = REAL_LISTINGS.find(l => l.id === id);
             const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const newBid = prompt('Votre offre pour ' + listing.title + '?\n(Minimum: €' + (listing.price + 1000) + ')', listing.price + 1000);
             if (!newBid) return;
@@ -223,18 +178,15 @@
         }
 
         function toggleFavorite() {
-            const params = new URLSearchParams(window.location.search);
-            const id = parseInt(params.get('id'));
-
             let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-            const index = favorites.indexOf(id);
+            const index = favorites.indexOf(listing.id);
 
             if (index > -1) {
                 favorites.splice(index, 1);
                 document.getElementById('favoriteBtn').textContent = '❤️ Ajouter aux favoris';
                 document.getElementById('favoriteBtn').classList.remove('added');
             } else {
-                favorites.push(id);
+                favorites.push(listing.id);
                 document.getElementById('favoriteBtn').textContent = '❤️ Retiré des favoris';
                 document.getElementById('favoriteBtn').classList.add('added');
             }
