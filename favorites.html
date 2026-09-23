@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoris - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .btn { padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn:hover { background: #2563eb; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .listings { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 20px; cursor: pointer; transition: transform 0.3s, border-color 0.3s; }
+        .card:hover { border-color: #3b82f6; transform: translateY(-4px); }
+        .image { width: 100%; height: 200px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 15px; background-size: cover; background-position: center; }
+        .title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+        .price { font-size: 1.5rem; color: #22c55e; font-weight: 700; }
+        .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❤️ Mes Favoris</h1>
+        <button class="btn" onclick="goBack()">← Retour</button>
+    </div>
+    <div class="container">
+        <div class="listings" id="list"></div>
+        <div id="empty" class="empty" style="display:none"><p>Aucun favori sauvegardé</p></div>
+    </div>
+
+    <script src="photo-data.js"></script>
+    <script src="listings-data.js"></script>
+    <script>
+        function init() {
+            const currentUserStr = localStorage.getItem('currentUser');
+            const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+            if (!currentUser || !currentUser.name) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+            if (favorites.length === 0) {
+                document.getElementById('empty').style.display = 'block';
+                return;
+            }
+            
+            const html = favorites.map(id => {
+                const listing = REAL_LISTINGS.find(l => l.id === id);
+                if (!listing) return '';
+                const photo = listing.photos && listing.photos.length > 0 ? listing.photos[0] : listing.emoji;
+                const bgStyle = photo.startsWith('data:') ? `background-image: url('${photo}'); background-size: cover; background-position: center;` : '';
+                return `<div class="card" onclick="window.location.href='listing-detail.html?id=${id}'">
+                    <div class="image" style="${bgStyle}">${bgStyle ? '' : listing.emoji}</div>
+                    <div class="title">${listing.title}</div>
+                    <div class="price">€${listing.price.toLocaleString('fr-FR')}</div>
+                </div>`;
+            }).join('');
+            
+            document.getElementById('list').innerHTML = html;
+        }
+        
+        function goBack() {
+            window.location.href = 'browse.html';
+        }
+        
+        init();
+    </script>
+</body>
+</html>
