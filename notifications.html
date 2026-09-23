@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        h1 { font-size: 2rem; }
+        .btn { padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; }
+        .btn:hover { background: #2563eb; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .notifications { display: flex; flex-direction: column; gap: 15px; }
+        .notification { background: rgba(30, 41, 59, 0.8); border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .notification.success { border-left-color: #22c55e; }
+        .notification.warning { border-left-color: #f59e0b; }
+        .notification.alert { border-left-color: #ef4444; }
+        .notification-content h3 { margin-bottom: 5px; font-size: 1.1rem; }
+        .notification-content p { color: #94a3b8; font-size: 0.9rem; }
+        .notification-time { color: #64748b; font-size: 0.85rem; white-space: nowrap; margin-left: 20px; }
+        .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .btn-clear { background: #ef4444; }
+        .btn-clear:hover { background: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔔 Notifications</h1>
+        <div>
+            <button class="btn btn-clear" onclick="clearAll()" id="clearBtn">Effacer tout</button>
+            <a href="browse.html" class="btn">← Retour</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="notifications" id="notificationsList"></div>
+        <div id="empty" class="empty" style="display:none"><p>Aucune notification</p></div>
+    </div>
+    <script>
+        function init() {
+            const currentUserStr = localStorage.getItem('currentUser');
+            const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+            const notifKey = 'notifications_' + currentUser.email;
+            const notifications = JSON.parse(localStorage.getItem(notifKey) || '[]');
+            if (notifications.length === 0) { document.getElementById('empty').style.display = 'block'; document.getElementById('clearBtn').style.display = 'none'; return; }
+            const html = notifications.sort((a, b) => new Date(b.time) - new Date(a.time)).map(n => {
+                const time = new Date(n.time).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                return `<div class="notification ${n.type}"><div class="notification-content"><h3>${n.title}</h3><p>${n.message}</p></div><div class="notification-time">${time}</div></div>`;
+            }).join('');
+            document.getElementById('notificationsList').innerHTML = html;
+        }
+        function clearAll() { if (confirm('Effacer toutes les notifications?')) { const currentUser = JSON.parse(localStorage.getItem('currentUser')); localStorage.setItem('notifications_' + currentUser.email, JSON.stringify([])); location.reload(); } }
+        init();
+    </script>
+</body>
+</html>

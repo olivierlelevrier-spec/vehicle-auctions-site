@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; padding: 20px; }
+        .header { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .btn { padding: 8px 16px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn:hover { background: #dc2626; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .profile-card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.3); border-radius: 12px; padding: 30px; margin-bottom: 30px; }
+        .user-info { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
+        .avatar { width: 80px; height: 80px; background: #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        .stat { background: rgba(71, 85, 105, 0.1); padding: 20px; border-radius: 8px; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #22c55e; }
+        .stat-label { color: #94a3b8; font-size: 0.9rem; }
+        .bids-section { margin-top: 40px; }
+        .bid-item { background: rgba(71, 85, 105, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .bid-car { font-weight: 600; }
+        .bid-amount { color: #22c55e; font-weight: 700; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👤 Mon Profil</h1>
+        <button class="btn" onclick="logout()">Déconnexion</button>
+    </div>
+
+    <div class="container">
+        <div class="profile-card">
+            <div class="user-info">
+                <div class="avatar">👤</div>
+                <div>
+                    <h2 id="name"></h2>
+                    <p id="email" style="color: #94a3b8;"></p>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="bidCount">0</div>
+                    <div class="stat-label">Enchères placées</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">€<span id="avgBid">0</span></div>
+                    <div class="stat-label">Offre moyenne</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">€<span id="maxBid">0</span></div>
+                    <div class="stat-label">Plus haute offre</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h3>📊 Historique des enchères</h3>
+            <div id="bidsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const cars = [
+            { id: 1, title: "BMW M3 2018" },
+            { id: 2, title: "Mercedes C63 2020" },
+            { id: 3, title: "Audi RS6 2019" },
+            { id: 4, title: "Porsche 911 2017" },
+            { id: 5, title: "Tesla Model S 2021" },
+            { id: 6, title: "Range Rover 2019" }
+        ];
+
+        function init(){
+            const user = JSON.parse(localStorage.getItem("currentUser"));
+            if (!user) { window.location.href = "index.html"; return; }
+            
+            document.getElementById("name").textContent = user.name;
+            document.getElementById("email").textContent = user.email;
+
+            const bidsKey = "bids_" + user.email;
+            const bidsStr = localStorage.getItem(bidsKey);
+            let bids = bidsStr ? JSON.parse(bidsStr) : [];
+            
+            document.getElementById("bidCount").textContent = bids.length;
+            
+            if (bids.length > 0) {
+                const amounts = bids.map(b => b.amount);
+                const avg = Math.round(amounts.reduce((a,b)=>a+b,0) / amounts.length);
+                const max = Math.max(...amounts);
+                document.getElementById("avgBid").textContent = avg.toLocaleString();
+                document.getElementById("maxBid").textContent = max.toLocaleString();
+            }
+
+            const listHtml = bids.length > 0 
+                ? bids.map(b => {
+                    const car = cars.find(c => c.id === b.carId);
+                    return `<div class="bid-item"><div><div class="bid-car">${car?.title || "Voiture"}</div><small style="color:#94a3b8">${new Date(b.date).toLocaleDateString('fr-FR')}</small></div><div class="bid-amount">€${b.amount.toLocaleString()}</div></div>`;
+                }).join("")
+                : "<p style='color:#94a3b8'>Aucune enchère pour le moment</p>";
+            
+            document.getElementById("bidsList").innerHTML = listHtml;
+        }
+
+        function logout(){
+            localStorage.removeItem("currentUser");
+            window.location.href = "index.html";
+        }
+
+        init();
+    </script>
+</body>
+</html>
