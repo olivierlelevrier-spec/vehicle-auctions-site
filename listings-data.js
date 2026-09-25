@@ -27,5 +27,19 @@ const REAL_LISTINGS = [
         fuel: 'Essence',
         description: 'Aixam S9 sans permis, 12 000 km. Parfait pour la ville, tres economique.',
         photos: []
+        },
+    {
+        id: 3,
+        title: 'Chevrolet Cruze LT - Diesel',
+        year: 2011,
+        price: 8500,
+        mileage: 205000,
+        emoji: '🚗',
+        brand: 'Chevrolet',
+        model: 'Cruze',
+        transmission: 'Manuelle',
+        fuel: 'Diesel',
+        description: 'Chevrolet Cruze LT 1.7 diesel, 205 000 km. Entretien regulier, CT valide jusqu en 2025.',
+        photos: []
     }
 ];

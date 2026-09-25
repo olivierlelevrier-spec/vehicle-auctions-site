@@ -104,7 +104,21 @@
         let currentPhotoIndex = 0;
         let listing = null;
 
-        function init() {
+        function loadPhotoData() {
+            const photoMap = {
+                1: AUDI_A1_PHOTO,
+                2: AIXAM_S9_PHOTO,
+                3: CHEVROLET_CRUZE_PHOTO
+            };
+            REAL_LISTINGS.forEach(listing => {
+                if (photoMap[listing.id]) {
+                    listing.photos = [photoMap[listing.id]];
+                }
+            });
+        }
+
+                function init() {
+            loadPhotoData();
             const params = new URLSearchParams(window.location.search);
             const id = parseInt(params.get('id'));
 
