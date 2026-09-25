@@ -145,8 +145,13 @@
 
             const thumbContainer = document.getElementById('thumbnails');
             thumbContainer.innerHTML = photos.map((photo, idx) => {
-                const bgStyle = photo.startsWith('data:') ? 'background-image: url(' + JSON.stringify(photo) + ');' : '';
-                return '<div class="thumbnail ' + (idx === 0 ? 'active' : '') + '" onclick="selectPhoto(' + idx + ')" style="' + bgStyle + '">' + (!bgStyle ? '📷' : '') + '</div>';
+                if (photo.startsWith('data:')) {
+                    // Image photo - juste afficher background-image, pas de contenu
+                    return '<div class="thumbnail ' + (idx === 0 ? 'active' : '') + '" onclick="selectPhoto(' + idx + ')" style="background-image: url(' + JSON.stringify(photo) + ');"></div>';
+                } else {
+                    // Emoji - afficher l'emoji
+                    return '<div class="thumbnail ' + (idx === 0 ? 'active' : '') + '" onclick="selectPhoto(' + idx + ')">📷</div>';
+                }
             }).join('');
         }
 
@@ -169,11 +174,13 @@
 
             if (photo.startsWith('data:')) {
                 mainEl.style.backgroundImage = 'url(' + JSON.stringify(photo) + ')';
+                mainEl.style.backgroundColor = 'transparent';
                 mainEl.style.backgroundSize = 'cover';
                 mainEl.style.backgroundPosition = 'center';
                 mainEl.textContent = '';
             } else {
                 mainEl.style.backgroundImage = 'none';
+                mainEl.style.backgroundColor = '';
                 mainEl.textContent = photo;
             }
         }

@@ -163,9 +163,10 @@
 
             container.innerHTML = REAL_LISTINGS.map(l => {
                 const firstPhoto = l.photos && l.photos.length > 0 ? l.photos[0] : l.emoji;
-                const bgStyle = firstPhoto.startsWith('data:') ? `background-image: url('${firstPhoto}');` : '';
+                const hasPhoto = firstPhoto.startsWith('data:');
+                const imgStyle = hasPhoto ? `background-image: url('${firstPhoto}'); background-color: transparent;` : '';
                 return '<div class="listing-card" onclick="viewListing(' + l.id + ')">' +
-                    '<div class="listing-image" style="' + bgStyle + '">' + (bgStyle ? '' : l.emoji) + '</div>' +
+                    '<div class="listing-image" style="' + imgStyle + '">' + (hasPhoto ? '' : l.emoji) + '</div>' +
                     '<div class="listing-title">' + l.title + '</div>' +
                     '<div class="listing-year">Année: ' + l.year + ' | ' + (l.mileage ? l.mileage.toLocaleString('fr-FR') + ' km' : '') + '</div>' +
                     '<div class="listing-price">€' + l.price.toLocaleString('fr-FR') + '</div>' +
