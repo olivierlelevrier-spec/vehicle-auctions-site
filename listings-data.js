@@ -32,7 +32,7 @@ const REAL_LISTINGS = [
         id: 3,
         title: 'Chevrolet Cruze LT - Diesel',
         year: 2011,
-        price: 8500,
+        price: 4500,
         mileage: 205000,
         emoji: '🚗',
         brand: 'Chevrolet',
