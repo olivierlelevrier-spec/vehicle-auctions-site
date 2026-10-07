@@ -124,7 +124,21 @@
     <script src="photo-data.js"></script>
     <script src="listings-data.js"></script>
     <script>
-        function init() {
+        function loadPhotoData() {
+            const photoMap = {
+                1: AUDI_A1_PHOTO,
+                2: AIXAM_S9_PHOTO,
+                3: CHEVROLET_CRUZE_PHOTO
+            };
+            REAL_LISTINGS.forEach(listing => {
+                if (photoMap[listing.id]) {
+                    listing.photos = [photoMap[listing.id]];
+                }
+            });
+        }
+
+                function init() {
+            loadPhotoData();
             const currentUserStr = localStorage.getItem('currentUser');
             const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
             if (!currentUser || !currentUser.name) window.location.href = 'index.html';
@@ -149,9 +163,10 @@
 
             container.innerHTML = REAL_LISTINGS.map(l => {
                 const firstPhoto = l.photos && l.photos.length > 0 ? l.photos[0] : l.emoji;
-                const bgStyle = firstPhoto.startsWith('data:') ? `background-image: url('${firstPhoto}');` : '';
+                const hasPhoto = firstPhoto.startsWith('data:');
+                const imgStyle = hasPhoto ? `background-image: url('${firstPhoto}'); background-color: transparent;` : '';
                 return '<div class="listing-card" onclick="viewListing(' + l.id + ')">' +
-                    '<div class="listing-image" style="' + bgStyle + '">' + (bgStyle ? '' : l.emoji) + '</div>' +
+                    '<div class="listing-image" style="' + imgStyle + '">' + (hasPhoto ? '' : l.emoji) + '</div>' +
                     '<div class="listing-title">' + l.title + '</div>' +
                     '<div class="listing-year">Année: ' + l.year + ' | ' + (l.mileage ? l.mileage.toLocaleString('fr-FR') + ' km' : '') + '</div>' +
                     '<div class="listing-price">€' + l.price.toLocaleString('fr-FR') + '</div>' +
