@@ -106,13 +106,13 @@
 
         function loadPhotoData() {
             const photoMap = {
-                1: AUDI_A1_PHOTO,
-                2: AIXAM_S9_PHOTO,
-                3: CHEVROLET_CRUZE_PHOTO
+                1: AUDI_A1_PHOTOS,
+                2: AIXAM_S9_PHOTOS,
+                3: CRUZE_PHOTOS
             };
             REAL_LISTINGS.forEach(listing => {
                 if (photoMap[listing.id]) {
-                    listing.photos = [photoMap[listing.id]];
+                    listing.photos = photoMap[listing.id];
                 }
             });
         }
