@@ -40,6 +40,18 @@
         <div class="listings" id="list"></div>
         <div id="empty" class="empty" style="display:none"><p>Aucune annonce pour le moment</p></div>
     </div>
+
+    <!-- MODAL POUR VOIR/ÉDITER ANNONCE -->
+    <div id="modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); z-index:1000; overflow-y:auto; padding:20px;">
+        <div style="max-width:700px; margin:40px auto; background:rgba(30,41,59,0.95); border:2px solid #22c55e; border-radius:12px; padding:30px;">
+            <h2 id="modalTitle">Voir Annonce</h2>
+            <div id="modalContent"></div>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-blue" id="modalEditBtn" onclick="switchToEdit()" style="display:none;">✏️ Éditer</button>
+                <button class="btn" onclick="closeModal()">Fermer</button>
+            </div>
+        </div>
+    </div>
     <script>
         function init() {
             const currentUserStr = localStorage.getItem('currentUser');
@@ -68,6 +80,102 @@
             }).join('');
             document.getElementById('list').innerHTML = html;
         }
+        let currentListing = null;
+        let isEditMode = false;
+
+        function getListing(id) {
+            const currentUserStr = localStorage.getItem('currentUser');
+            const currentUser = JSON.parse(currentUserStr);
+            const myListings = JSON.parse(localStorage.getItem('myListings_' + currentUser.email) || '[]');
+            return myListings.find(l => l.id === id);
+        }
+
+        function viewListing(id) {
+            currentListing = getListing(id);
+            isEditMode = false;
+            displayListing();
+            document.getElementById('modalEditBtn').style.display = 'inline-block';
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function editListing(id) {
+            currentListing = getListing(id);
+            isEditMode = true;
+            displayListing();
+            document.getElementById('modalEditBtn').style.display = 'none';
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function displayListing() {
+            const l = currentListing;
+            if (!l) return;
+
+            const content = isEditMode ? `
+                <div style="margin:20px 0;">
+                    <label>Titre *</label>
+                    <input type="text" id="editTitle" value="${l.title}" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #22c55e; border-radius:6px; background:white; color:black;">
+
+                    <label>Prix (EUR) *</label>
+                    <input type="number" id="editPrice" value="${l.price}" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #22c55e; border-radius:6px; background:white; color:black;">
+
+                    <label>Description *</label>
+                    <textarea id="editDescription" style="width:100%; padding:10px; margin-bottom:15px; border:1px solid #22c55e; border-radius:6px; background:white; color:black; min-height:100px;">${l.description}</textarea>
+
+                    <button class="btn" onclick="saveListing()" style="width:100%;">💾 Sauvegarder</button>
+                </div>
+            ` : `
+                <div style="background:rgba(71,85,105,0.1); padding:15px; border-radius:8px; margin:15px 0;">
+                    <p><strong>Titre:</strong> ${l.title}</p>
+                    <p><strong>Prix:</strong> €${l.price.toLocaleString('fr-FR')}</p>
+                    <p><strong>Année:</strong> ${l.year} | <strong>Kilométrage:</strong> ${l.mileage} km</p>
+                    <p><strong>Description:</strong> ${l.description}</p>
+                    ${l.photos && l.photos.length > 0 ? `<p><strong>Photos:</strong> ${l.photos.length} photo(s)</p>` : ''}
+                    ${l.ct && l.ct.date ? `<p><strong>CT:</strong> ${l.ct.date} (${l.ct.validity || 'N/A'})</p>` : ''}
+                    ${l.costs && (l.costs.done > 0 || l.costs.planned > 0) ? `<p><strong>Frais:</strong> Réalisés: €${l.costs.done}, Prévus: €${l.costs.planned}</p>` : ''}
+                </div>
+            `;
+
+            document.getElementById('modalTitle').textContent = isEditMode ? 'Éditer Annonce' : 'Voir Annonce';
+            document.getElementById('modalContent').innerHTML = content;
+        }
+
+        function saveListing() {
+            const title = document.getElementById('editTitle').value.trim();
+            const price = parseInt(document.getElementById('editPrice').value);
+            const description = document.getElementById('editDescription').value.trim();
+
+            if (!title || !price || !description) {
+                alert('Remplissez les champs obligatoires');
+                return;
+            }
+
+            const currentUserStr = localStorage.getItem('currentUser');
+            const currentUser = JSON.parse(currentUserStr);
+            let myListings = JSON.parse(localStorage.getItem('myListings_' + currentUser.email) || '[]');
+
+            const idx = myListings.findIndex(l => l.id === currentListing.id);
+            if (idx >= 0) {
+                myListings[idx].title = title;
+                myListings[idx].price = price;
+                myListings[idx].description = description;
+                localStorage.setItem('myListings_' + currentUser.email, JSON.stringify(myListings));
+                alert('Annonce mise à jour!');
+                location.reload();
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            currentListing = null;
+            isEditMode = false;
+        }
+
+        function switchToEdit() {
+            isEditMode = true;
+            displayListing();
+            document.getElementById('modalEditBtn').style.display = 'none';
+        }
+
         function deleteListing(id) {
             if (!confirm('Supprimer cette annonce?')) return;
             const currentUserStr = localStorage.getItem('currentUser');
@@ -77,8 +185,7 @@
             localStorage.setItem('myListings_' + currentUser.email, JSON.stringify(myListings));
             location.reload();
         }
-        function editListing(id) { alert('Édition à venir'); }
-        function viewListing(id) { alert('Consultation à venir'); }
+
         init();
     </script>
 </body>
